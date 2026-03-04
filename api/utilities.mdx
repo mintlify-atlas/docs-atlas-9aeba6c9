@@ -408,3 +408,73 @@ print(f"{RED}[!]{RESET} Error encontrado")
 print(f"{YELLOW}[*]{RESET} Procesando...")
 print(f"{BOLD}Texto en negrita{RESET}")
 ```
+
+---
+
+## main()
+
+The main entry point for the IP-Tracker application. Initializes the results directory and launches the main menu with keyboard interrupt handling.
+
+### Function Signature
+
+```python
+def main() -> None
+```
+
+### Parameters
+
+This function takes no parameters.
+
+### Return Value
+
+<ResponseField name="return" type="None">
+  This function does not return a value. It runs until the user exits or presses Ctrl+C.
+</ResponseField>
+
+### Behavior
+
+The main function performs three key operations:
+
+1. **Directory initialization**: Calls `crear_carpeta_resultados()` to ensure the output directory exists
+2. **Menu launch**: Calls `menu_principal()` to start the interactive interface
+3. **Interrupt handling**: Catches `KeyboardInterrupt` (Ctrl+C) and exits gracefully
+
+### Code Example
+
+```python
+# This is the entry point when running the script
+if __name__ == "__main__":
+    main()
+```
+
+### Implementation Details
+
+Source code from tracker.py:409-417:
+
+```python
+def main():
+    """Función principal"""
+    try:
+        crear_carpeta_resultados()
+        menu_principal()
+    except KeyboardInterrupt:
+        limpiar_pantalla()
+        print(f"\n{YELLOW}[!]{RESET} Programa interrumpido por el usuario\n")
+        sys.exit(0)
+```
+
+### Exit Codes
+
+- **Normal exit**: Returns 0 (via menu option 3)
+- **Keyboard interrupt**: Returns 0 (Ctrl+C pressed)
+- **Uncaught exception**: Returns non-zero error code
+
+### Usage
+
+Run the application from the command line:
+
+```bash
+python3 tracker.py
+```
+
+This executes the `main()` function, which sets up the environment and starts the interactive menu system.

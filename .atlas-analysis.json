@@ -60,12 +60,17 @@
     "Support for multiple phone number formats (E.164, international, national)"
   ],
   "publicApiSurface": [
+    "main() - Main entry point for the application",
     "geolocalizar_ip_metodo1(ip_address) - IP geolocation using ip-api.com",
     "geolocalizar_ip_metodo2(ip_address) - IP geolocation using ipinfo.io",
     "analizar_telefono() - Phone number analysis and validation",
     "validar_ip(ip) - IP address format validation",
     "validar_telefono(numero_completo) - Phone number format validation",
     "menu_ip() - Interactive IP tracking menu",
-    "menu_principal() - Main application menu"
+    "menu_principal() - Main application menu",
+    "crear_carpeta_resultados() - Creates results directory",
+    "limpiar_pantalla() - Clears terminal screen",
+    "pausar() - Pauses for user input",
+    "banner() - Displays ASCII art banner"
   ]
 }
