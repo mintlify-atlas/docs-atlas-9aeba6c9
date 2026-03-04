@@ -1,0 +1,71 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "IP-Tracker",
+  "projectDescription": "Advanced IP geolocation and phone number information lookup tool for OSINT and cybersecurity research",
+  "theme": "aspen",
+  "primaryColor": "#2563eb",
+  "lightColor": "#60a5fa",
+  "darkColor": "#1e40af",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get Started",
+        "pages": [
+          "introduction",
+          "installation",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Features",
+        "pages": [
+          "features/ip-geolocation",
+          "features/phone-lookup",
+          "features/output-management"
+        ]
+      },
+      {
+        "group": "Usage Guide",
+        "pages": [
+          "usage/ip-tracking",
+          "usage/phone-analysis",
+          "usage/comparison-mode"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api/overview",
+          "api/ip-methods",
+          "api/phone-methods",
+          "api/utilities"
+        ]
+      },
+      {
+        "group": "Resources",
+        "pages": [
+          "resources/legal-disclaimer",
+          "resources/troubleshooting",
+          "resources/faq"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "IP geolocation using multiple APIs (ip-api.com and ipinfo.io)",
+    "Phone number validation and carrier lookup with phonenumbers library",
+    "Detailed geographic information including coordinates and timezone",
+    "Automatic results export to timestamped text files",
+    "Interactive CLI menu with comparison mode",
+    "Support for multiple phone number formats (E.164, international, national)"
+  ],
+  "publicApiSurface": [
+    "geolocalizar_ip_metodo1(ip_address) - IP geolocation using ip-api.com",
+    "geolocalizar_ip_metodo2(ip_address) - IP geolocation using ipinfo.io",
+    "analizar_telefono() - Phone number analysis and validation",
+    "validar_ip(ip) - IP address format validation",
+    "validar_telefono(numero_completo) - Phone number format validation",
+    "menu_ip() - Interactive IP tracking menu",
+    "menu_principal() - Main application menu"
+  ]
+}
