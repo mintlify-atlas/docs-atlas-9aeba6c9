@@ -1,0 +1,102 @@
+---
+title: Introduction
+description: IP-Tracker is an advanced OSINT tool for IP geolocation and phone number intelligence gathering
+---
+
+IP-Tracker is a powerful command-line tool designed for OSINT (Open Source Intelligence) operations, cybersecurity research, and network analysis. It provides comprehensive geolocation tracking for IP addresses and detailed intelligence gathering for phone numbers.
+
+## What is IP-Tracker?
+
+IP-Tracker is a Python-based reconnaissance tool that queries multiple public APIs to gather detailed information about IP addresses and phone numbers. The tool automatically saves all results to organized text files for documentation and further analysis.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Dual IP geolocation methods" icon="map-location-dot">
+    Query two different APIs (ip-api.com and ipinfo.io) for comprehensive IP intelligence with cross-validation support
+  </Card>
+  <Card title="Phone number intelligence" icon="phone">
+    Extract carrier, country, timezone, number type, and validation status from international phone numbers
+  </Card>
+  <Card title="Automatic result storage" icon="floppy-disk">
+    All queries are timestamped and saved to organized text files in the Resultados_Tracker directory
+  </Card>
+  <Card title="Google Maps integration" icon="location-dot">
+    Direct links to geographic coordinates on Google Maps for visual location verification
+  </Card>
+</CardGroup>
+
+## IP geolocation capabilities
+
+When tracking an IP address, IP-Tracker retrieves:
+
+- **Geographic data**: Country, region, city, postal code, coordinates (latitude/longitude)
+- **Network information**: ISP, organization, AS number, hostname
+- **Infrastructure details**: Timezone, country codes
+- **Google Maps links**: Direct visualization of coordinates
+
+<Note>
+IP-Tracker uses two different APIs to cross-reference data and ensure accuracy. Method 1 (ip-api.com) provides more detailed ISP information, while Method 2 (ipinfo.io) includes hostname data.
+</Note>
+
+## Phone number intelligence capabilities
+
+The phone analysis module leverages the `phonenumbers` library to extract:
+
+- **Validation**: Check if numbers are valid and possible
+- **Formatting**: International, E.164, and national formats
+- **Geographic data**: Country, region, country code
+- **Carrier information**: Network operator name
+- **Number type**: Mobile, fixed line, VoIP, toll-free, premium rate, etc.
+- **Timezone**: Associated timezones for the number
+
+## Use cases for OSINT and cybersecurity
+
+<AccordionGroup>
+  <Accordion title="Threat intelligence">
+    Track the geographic origin of suspicious IP addresses from security logs, identify hosting providers of malicious infrastructure, and correlate attack sources across multiple incidents.
+  </Accordion>
+  
+  <Accordion title="Digital forensics">
+    Document IP addresses and phone numbers involved in investigations with timestamped reports, trace communication patterns, and maintain evidence chains with organized output files.
+  </Accordion>
+  
+  <Accordion title="Network reconnaissance">
+    Gather intelligence about target networks during penetration testing engagements, identify ISPs and hosting providers, and map network infrastructure.
+  </Accordion>
+  
+  <Accordion title="Social engineering research">
+    Validate phone numbers for OSINT investigations, identify carrier and number type for verification, and research geographic origins of communication.
+  </Accordion>
+  
+  <Accordion title="Incident response">
+    Quickly geolocate attacker IPs during active incidents, identify network ownership for abuse reporting, and document threat actor infrastructure.
+  </Accordion>
+</AccordionGroup>
+
+## Ethical usage
+
+<Warning>
+IP-Tracker has been developed exclusively for **educational purposes and cybersecurity research**. Misuse of this tool may be **illegal**. Users are responsible for ensuring their usage complies with applicable laws and regulations. Always obtain proper authorization before conducting reconnaissance on systems you do not own.
+</Warning>
+
+## How it works
+
+IP-Tracker operates entirely through public APIs and Python libraries:
+
+1. **IP geolocation**: Queries ip-api.com and ipinfo.io REST APIs with timeout handling
+2. **Phone analysis**: Uses Google's libphonenumber Python library (phonenumbers package)
+3. **Data validation**: Validates IP address format with regex and phone numbers with libphonenumber
+4. **Result storage**: Automatically creates timestamped files in the `Resultados_Tracker` directory
+5. **Error handling**: Gracefully handles timeouts, connection errors, and invalid inputs
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install IP-Tracker and its dependencies
+  </Card>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Run your first IP lookup and phone analysis
+  </Card>
+</CardGroup>

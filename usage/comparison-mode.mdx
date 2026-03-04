@@ -1,0 +1,426 @@
+---
+title: 'API Comparison Mode'
+description: 'How to compare multiple IP geolocation APIs simultaneously for cross-validation'
+---
+
+# API Comparison Mode
+
+Comparison mode (Option 3) allows you to query both IP geolocation APIs simultaneously, providing comprehensive cross-referenced data for more accurate IP intelligence.
+
+## What is Comparison Mode?
+
+Comparison mode automatically runs both IP tracking methods in sequence:
+1. **Method 1** (ip-api.com) - Queries first
+2. **Method 2** (ipinfo.io) - Queries second
+
+Both results are displayed and saved separately, allowing you to compare and validate the data.
+
+## When to Use Comparison Mode
+
+<Tip>
+**Ideal use cases for comparison mode:**
+
+- **Investigating suspicious IPs**: Security analysis, threat detection, abuse reports
+- **Verifying accuracy**: When precise geolocation is critical
+- **Data validation**: Confirming information before making decisions
+- **Unknown sources**: Tracking IPs from unfamiliar networks
+- **Research projects**: Academic or professional IP intelligence gathering
+- **VPN/Proxy detection**: Comparing data inconsistencies
+</Tip>
+
+<Warning>
+**When NOT to use comparison mode:**
+
+- Routine IP lookups (use single method instead)
+- High-volume tracking (counts against both API limits)
+- When one API is known to be sufficient for your region
+- Quick checks (comparison takes twice as long)
+</Warning>
+
+## How to Use Comparison Mode
+
+<Steps>
+  <Step title="Navigate to IP tracking menu">
+    From the main menu, select option `1` to access IP geolocation:
+    
+    ```
+    [+] Ingrese una opción: 1
+    ```
+  </Step>
+
+  <Step title="Select comparison option">
+    In the IP tracking submenu, choose option `3`:
+    
+    ```
+    ============================================================
+    GEOLOCALIZACIÓN DE IP
+    ============================================================
+    
+    [1] Método 1 (ip-api.com) - Más información
+    [2] Método 2 (ipinfo.io) - Alternativo
+    [3] Comparar ambos métodos
+    [99] Volver al menú principal
+    
+    [+] Ingrese una opción: 3
+    ```
+  </Step>
+
+  <Step title="Enter IP address">
+    Input the IP address to analyze:
+    
+    ```
+    Ingrese la dirección IP: 8.8.8.8
+    ```
+    
+    The IP is validated once but queried against both APIs.
+  </Step>
+
+  <Step title="Review Method 1 results">
+    First, you'll see complete results from ip-api.com:
+    
+    ```
+    [*] Consultando ip-api.com...
+    
+    ============================================================
+    RESULTADOS DE GEOLOCALIZACIÓN
+    ============================================================
+    IP: 8.8.8.8
+    País: United States (US)
+    Región: California
+    Ciudad: Mountain View
+    Código postal: 94035
+    Coordenadas: 37.386, -122.0838
+    Zona horaria: America/Los_Angeles
+    ISP: Google LLC
+    Organización: Google Public DNS
+    
+    [✓] Resultados guardados en: Resultados_Tracker/IP_8.8.8.8_20260304_160145.txt
+    ```
+  </Step>
+
+  <Step title="Review Method 2 results">
+    Immediately after, you'll see results from ipinfo.io:
+    
+    ```
+    [*] Consultando ipinfo.io...
+    
+    ============================================================
+    RESULTADOS DE GEOLOCALIZACIÓN
+    ============================================================
+    IP: 8.8.8.8
+    Hostname: dns.google
+    Ciudad: Mountain View
+    Región: California
+    País: US
+    Código postal: 94035
+    Coordenadas: 37.4056, -122.0775
+    Organización: AS15169 Google LLC
+    Zona horaria: America/Los_Angeles
+    
+    [✓] Resultados guardados en: Resultados_Tracker/IP_8.8.8.8_metodo2_20260304_160148.txt
+    ```
+  </Step>
+
+  <Step title="Compare and analyze">
+    Review both outputs to identify:
+    - Matching data points (confirms accuracy)
+    - Differences in coordinates (precision variance)
+    - Additional information from either API
+    - Any inconsistencies (potential red flags)
+  </Step>
+</Steps>
+
+## Benefits of Comparison Mode
+
+### 1. Data Cross-Validation
+
+Comparing two independent sources increases confidence in results:
+
+```
+Method 1: Ciudad: Mountain View
+Method 2: Ciudad: Mountain View
+✓ Match - High confidence in city location
+
+Method 1: Coordenadas: 37.386, -122.0838
+Method 2: Coordenadas: 37.4056, -122.0775
+✓ Close match - ~2.5km difference (normal variance)
+```
+
+<Note>
+**Normal variances between APIs:**
+- Coordinates: ±0.1° difference is typical (~10km)
+- City: Should match exactly for most IPs
+- Region/State: Usually identical
+- ISP/Org: May have different formatting
+</Note>
+
+### 2. Complementary Information
+
+Each API provides unique data points:
+
+| Data Point | Method 1 (ip-api.com) | Method 2 (ipinfo.io) |
+|------------|----------------------|---------------------|
+| AS Number | ✓ (in 'as' field) | ✓ (in 'org' field) |
+| Hostname | ✗ | ✓ |
+| Country Code | ✓ (2-letter) | ✓ (2-letter) |
+| Full Country Name | ✓ | ✗ |
+| Zip/Postal | ✓ | ✓ |
+| ISP vs Org | Separate fields | Combined |
+
+### 3. Detecting Proxies and VPNs
+
+Significant discrepancies between APIs may indicate:
+- VPN or proxy usage
+- IP spoofing attempts
+- Misconfigured network
+- Recently reassigned IP blocks
+
+<Warning>
+**Red flags in comparison:**
+
+```
+Method 1: País: United States, Ciudad: New York
+Method 2: País: Russia, Ciudad: Moscow
+
+⚠️ Major discrepancy - investigate further!
+```
+
+Large differences (different countries/continents) warrant investigation.
+</Warning>
+
+### 4. Redundancy and Reliability
+
+If one API fails or times out, you still get data from the other:
+
+```
+Method 1: [✓] Success - Full results
+Method 2: [!] Error: Tiempo de espera agotado
+
+Result: You still have complete data from Method 1
+```
+
+## Interpreting Comparison Results
+
+### Scenario 1: Perfect Match
+
+```
+Method 1:                          Method 2:
+- Ciudad: London                   - Ciudad: London
+- País: United Kingdom (GB)        - País: GB
+- Coordenadas: 51.5074, -0.1278   - Coordenadas: 51.5142, -0.0931
+```
+
+**Analysis**: ✓ High confidence. Minor coordinate variance is normal (~4km difference).
+
+### Scenario 2: Minor Differences
+
+```
+Method 1:                          Method 2:
+- ISP: Comcast Cable              - Organización: AS7922 Comcast Cable
+- Organización: Comcast            Communications LLC
+```
+
+**Analysis**: ✓ Same entity, different formatting. This is expected.
+
+### Scenario 3: Data Center vs Residential
+
+```
+Method 1:                          Method 2:
+- ISP: DigitalOcean LLC           - Hostname: droplet-123.digitalocean.com
+- Ciudad: San Francisco           - Ciudad: San Francisco
+```
+
+**Analysis**: ✓ Consistent. Hostname confirms it's a cloud server.
+
+### Scenario 4: Suspicious Mismatch
+
+```
+Method 1:                          Method 2:
+- País: United States (US)        - País: CN
+- Ciudad: Los Angeles             - Ciudad: Beijing
+- ISP: Verizon                    - ISP: China Telecom
+```
+
+**Analysis**: ⚠️ Major red flag. Investigate for VPN, proxy, or data error.
+
+## Performance Considerations
+
+### API Rate Limits
+
+Using comparison mode counts as requests to both APIs:
+
+| API | Free Tier Limit | Comparison Impact |
+|-----|----------------|------------------|
+| ip-api.com | 45 requests/minute | 1 comparison = 1 request |
+| ipinfo.io | 50,000 requests/month | 1 comparison = 1 request |
+
+<Tip>
+**Rate limit management:**
+
+- Use comparison mode selectively (not for every lookup)
+- For bulk operations, consider single-method queries
+- Space out comparison queries if doing many in succession
+- Monitor your ipinfo.io monthly quota if using heavily
+</Tip>
+
+### Query Timing
+
+Comparison mode takes longer than single queries:
+
+- **Single method**: ~1-2 seconds per query
+- **Comparison mode**: ~2-4 seconds (sequential execution)
+
+<Note>
+Queries run sequentially (Method 1 then Method 2) to avoid overwhelming your connection. If Method 1 fails, Method 2 still runs.
+</Note>
+
+## Saved Results
+
+Comparison mode creates two separate files:
+
+```
+Resultados_Tracker/
+├── IP_8.8.8.8_20260304_160145.txt        (Method 1)
+└── IP_8.8.8.8_metodo2_20260304_160148.txt (Method 2)
+```
+
+**File naming:**
+- Method 1: `IP_<address>_<timestamp>.txt`
+- Method 2: `IP_<address>_metodo2_<timestamp>.txt`
+
+**Timestamp difference**: Files have slightly different timestamps (2-3 seconds apart) since queries run sequentially.
+
+<Tip>
+Keep both files together when archiving or sharing results. The pairing provides complete intelligence on the IP.
+</Tip>
+
+## Best Practices
+
+<Steps>
+  <Step title="Use for high-value targets">
+    Reserve comparison mode for IPs that matter:
+    - Security incidents
+    - Fraud investigations  
+    - Legal evidence
+    - Important business decisions
+  </Step>
+
+  <Step title="Compare systematically">
+    Create a checklist:
+    - [ ] Country matches
+    - [ ] City matches  
+    - [ ] Coordinates within 10km
+    - [ ] ISP/Org logically consistent
+    - [ ] Time zone matches
+    - [ ] No major red flags
+  </Step>
+
+  <Step title="Document discrepancies">
+    If you find mismatches:
+    - Note the specific differences
+    - Research the IP range (WHOIS lookup)
+    - Check if it's a known VPN/proxy
+    - Verify with a third method if critical
+  </Step>
+
+  <Step title="Archive results properly">
+    Keep comparison files together:
+    ```bash
+    # Good: Keep method pairs together
+    2026-03-04_Investigation/
+    ├── IP_8.8.8.8_20260304_160145.txt
+    └── IP_8.8.8.8_metodo2_20260304_160148.txt
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### One API Succeeds, One Fails
+
+```
+[✓] Method 1 completed successfully
+[!] Method 2: Error: No se pudo conectar al servidor
+```
+
+**What to do:**
+- You still have data from Method 1
+- Try running Method 2 separately later
+- Check if ipinfo.io is experiencing outages
+- Verify your internet connection stability
+
+### Both APIs Show Different Countries
+
+**Possible causes:**
+1. **Recent IP reassignment**: Databases not yet synchronized
+2. **Anycast network**: IP routes to nearest node
+3. **VPN/Proxy**: IP is routing traffic through another country
+4. **Database error**: One API has outdated data
+
+**Action steps:**
+1. Run a WHOIS lookup on the IP
+2. Check the IP on other geolocation services
+3. Investigate the ISP/Organization
+4. Consider the IP may be masking location
+
+### Coordinates Don't Match Maps
+
+```
+Coordinates: 37.751, -97.822
+Google Maps: Shows geographic center of USA (not a real location)
+```
+
+**Explanation**: When precise location is unknown, APIs may return:
+- Country center
+- Region/state center  
+- City center
+- ISP headquarters
+
+This is **normal** for privacy-protected or mobile IPs.
+
+## Advanced Use Cases
+
+### Security Incident Response
+
+```bash
+# Workflow for investigating suspicious login
+1. Get IP from security logs
+2. Run comparison mode
+3. Compare to user's known location
+4. Check if ISP matches typical provider
+5. Look for VPN/datacenter indicators
+6. Document findings in incident report
+```
+
+### Fraud Detection
+
+```bash
+# E-commerce transaction verification
+1. Capture customer IP at checkout
+2. Run comparison mode
+3. Verify country matches billing address
+4. Check for high-risk datacenter IPs
+5. Flag mismatches for review
+```
+
+### Network Administration
+
+```bash
+# Validating network configuration
+1. Test public-facing IPs
+2. Run comparison to verify routing
+3. Confirm geographic optimization
+4. Validate CDN/load balancer locations
+```
+
+## Summary
+
+Comparison mode is a powerful tool for:
+
+✓ **Cross-validating** IP geolocation data  
+✓ **Detecting** VPNs, proxies, and anomalies  
+✓ **Increasing confidence** in location intelligence  
+✓ **Providing redundancy** if one API fails  
+✓ **Gathering comprehensive** data from multiple sources
+
+Use it strategically for high-value IP intelligence where accuracy matters most.

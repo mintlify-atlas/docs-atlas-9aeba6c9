@@ -1,0 +1,276 @@
+---
+title: 'IP Geolocation Methods'
+description: 'Functions for geolocating IP addresses using multiple API providers'
+icon: 'location-dot'
+---
+
+## geolocalizar_ip_metodo1()
+
+Primary IP geolocation method using the ip-api.com service. This method provides comprehensive geolocation data including ISP information and does not require an API key.
+
+### Function Signature
+
+```python
+def geolocalizar_ip_metodo1(ip_address: str) -> dict | None
+```
+
+### Parameters
+
+<ParamField path="ip_address" type="string" required>
+  The IPv4 address to geolocate. Must be a valid IP address format (e.g., "8.8.8.8"). Private IP addresses will return an error from the API.
+</ParamField>
+
+### Return Value
+
+<ResponseField name="response" type="dict | None">
+  Returns a dictionary with geolocation data on success, or `None` if the request fails.
+</ResponseField>
+
+### Response Data Structure
+
+<ResponseField name="query" type="string">
+  The IP address that was queried
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  Full country name (e.g., "United States")
+</ResponseField>
+
+<ResponseField name="countryCode" type="string">
+  Two-letter country code (e.g., "US")
+</ResponseField>
+
+<ResponseField name="regionName" type="string">
+  Region or state name
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  City name
+</ResponseField>
+
+<ResponseField name="zip" type="string">
+  Postal/ZIP code
+</ResponseField>
+
+<ResponseField name="lat" type="float">
+  Latitude coordinate
+</ResponseField>
+
+<ResponseField name="lon" type="float">
+  Longitude coordinate
+</ResponseField>
+
+<ResponseField name="timezone" type="string">
+  Timezone identifier (e.g., "America/New_York")
+</ResponseField>
+
+<ResponseField name="isp" type="string">
+  Internet Service Provider name
+</ResponseField>
+
+<ResponseField name="org" type="string">
+  Organization name
+</ResponseField>
+
+<ResponseField name="as" type="string">
+  Autonomous System information
+</ResponseField>
+
+### Code Example
+
+```python
+from tracker import geolocalizar_ip_metodo1, validar_ip
+
+# Validate and geolocate an IP address
+ip = "8.8.8.8"
+
+if validar_ip(ip):
+    resultado = geolocalizar_ip_metodo1(ip)
+    
+    if resultado:
+        print(f"País: {resultado['country']}")
+        print(f"Ciudad: {resultado['city']}")
+        print(f"ISP: {resultado['isp']}")
+        print(f"Coordenadas: {resultado['lat']}, {resultado['lon']}")
+    else:
+        print("Error al obtener información de geolocalización")
+else:
+    print("Dirección IP inválida")
+```
+
+### Side Effects
+
+- Creates `Resultados_Tracker/` directory if it doesn't exist
+- Saves results to a text file: `IP_{ip_address}_{timestamp}.txt`
+- Prints formatted output to console with colored text
+- Includes Google Maps URL in output file
+
+### Exceptions and Error Handling
+
+<ResponseField name="requests.exceptions.Timeout" type="exception">
+  Raised when the API request exceeds 10 seconds. Function catches this and returns `None`.
+</ResponseField>
+
+<ResponseField name="requests.exceptions.ConnectionError" type="exception">
+  Raised when unable to connect to the API server. Function catches this and returns `None`.
+</ResponseField>
+
+<ResponseField name="HTTP Status != 200" type="error">
+  If the API returns a non-200 status code, the function prints an error and returns `None`.
+</ResponseField>
+
+<ResponseField name="API status: 'fail'" type="error">
+  If the API returns `status: 'fail'` in the response (e.g., for invalid or private IPs), the function prints the error message and returns `None`.
+</ResponseField>
+
+### API Details
+
+- **Endpoint**: `http://ip-api.com/json/{ip_address}`
+- **Method**: GET
+- **Timeout**: 10 seconds
+- **Rate Limit**: Free tier allows 45 requests per minute
+- **Authentication**: None required
+
+---
+
+## geolocalizar_ip_metodo2()
+
+Alternative IP geolocation method using the ipinfo.io service. Provides similar data with slightly different field names and structure.
+
+### Function Signature
+
+```python
+def geolocalizar_ip_metodo2(ip_address: str) -> dict | None
+```
+
+### Parameters
+
+<ParamField path="ip_address" type="string" required>
+  The IPv4 address to geolocate. Must be a valid IP address format (e.g., "8.8.8.8").
+</ParamField>
+
+### Return Value
+
+<ResponseField name="response" type="dict | None">
+  Returns a dictionary with geolocation data on success, or `None` if the request fails.
+</ResponseField>
+
+### Response Data Structure
+
+<ResponseField name="ip" type="string">
+  The IP address that was queried
+</ResponseField>
+
+<ResponseField name="hostname" type="string">
+  Hostname associated with the IP address
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  City name
+</ResponseField>
+
+<ResponseField name="region" type="string">
+  Region or state name
+</ResponseField>
+
+<ResponseField name="country" type="string">
+  Two-letter country code (e.g., "US")
+</ResponseField>
+
+<ResponseField name="postal" type="string">
+  Postal/ZIP code
+</ResponseField>
+
+<ResponseField name="loc" type="string">
+  Comma-separated latitude and longitude (e.g., "37.751,-97.822")
+</ResponseField>
+
+<ResponseField name="org" type="string">
+  Organization name (typically includes AS number and ISP)
+</ResponseField>
+
+<ResponseField name="timezone" type="string">
+  Timezone identifier (e.g., "America/Chicago")
+</ResponseField>
+
+### Code Example
+
+```python
+from tracker import geolocalizar_ip_metodo2, validar_ip
+
+# Geolocate using the alternative method
+ip = "1.1.1.1"
+
+if validar_ip(ip):
+    resultado = geolocalizar_ip_metodo2(ip)
+    
+    if resultado:
+        # Parse coordinates from loc field
+        loc = resultado['loc'].split(',')
+        lat, lon = loc[0], loc[1]
+        
+        print(f"IP: {resultado['ip']}")
+        print(f"Hostname: {resultado.get('hostname', 'N/A')}")
+        print(f"País: {resultado['country']}")
+        print(f"Ciudad: {resultado['city']}")
+        print(f"Coordenadas: {lat}, {lon}")
+        print(f"Organización: {resultado['org']}")
+    else:
+        print("Error al obtener información")
+else:
+    print("IP inválida")
+```
+
+### Side Effects
+
+- Creates `Resultados_Tracker/` directory if it doesn't exist
+- Saves results to a text file: `IP_{ip_address}_metodo2_{timestamp}.txt`
+- Prints formatted output to console with colored text
+- Includes Google Maps URL in output file
+- Parses `loc` field to separate latitude and longitude
+
+### Exceptions and Error Handling
+
+<ResponseField name="requests.exceptions.Timeout" type="exception">
+  Raised when the API request exceeds 10 seconds. Function catches this and returns `None`.
+</ResponseField>
+
+<ResponseField name="requests.exceptions.ConnectionError" type="exception">
+  Raised when unable to connect to the API server. Function catches this and returns `None`.
+</ResponseField>
+
+<ResponseField name="HTTP Status != 200" type="error">
+  If the API returns a non-200 status code, the function prints an error and returns `None`.
+</ResponseField>
+
+<ResponseField name="'error' in response" type="error">
+  If the API returns an error object in the response, the function prints the error message and returns `None`.
+</ResponseField>
+
+### API Details
+
+- **Endpoint**: `https://ipinfo.io/{ip_address}/json`
+- **Method**: GET
+- **Timeout**: 10 seconds
+- **Rate Limit**: Free tier allows 50,000 requests per month
+- **Authentication**: None required (free tier)
+
+## Comparison: Method 1 vs Method 2
+
+| Feature | Method 1 (ip-api.com) | Method 2 (ipinfo.io) |
+|---------|----------------------|----------------------|
+| **ISP Field** | Separate `isp` field | Included in `org` field |
+| **Country** | Full name + code | Code only |
+| **Hostname** | Not provided | Provided |
+| **AS Info** | Separate `as` field | Included in `org` field |
+| **Coordinates** | Separate `lat`/`lon` | Combined `loc` string |
+| **Rate Limit** | 45 req/min | 50k req/month |
+
+## Best Practices
+
+1. **Always validate** the IP address using `validar_ip()` before calling geolocation methods
+2. **Handle None returns** - Check if the return value is `None` before accessing data
+3. **Use Method 1** for more detailed ISP information
+4. **Use Method 2** for hostname resolution
+5. **Implement retry logic** for production use cases to handle transient network errors
+6. **Check rate limits** if making multiple requests

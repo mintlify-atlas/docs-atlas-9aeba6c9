@@ -1,0 +1,273 @@
+---
+title: Phone lookup
+description: Analyze phone numbers with validation, carrier detection, timezone identification, and international format conversion
+---
+
+The phone lookup feature uses the powerful `phonenumbers` library to parse, validate, and extract comprehensive information from phone numbers worldwide. It supports international formats and provides detailed carrier and geographic data.
+
+## Number validation
+
+The application performs two levels of validation:
+
+<Tabs>
+  <Tab title="Valid number">
+    ### Valid number check
+    
+    Determines if a number is **valid** according to international numbering plans:
+    
+    ```python
+    phone_obj = phonenumbers.parse(numero_completo)
+    es_valido = phonenumbers.is_valid_number(phone_obj)
+    ```
+    
+    A valid number:
+    - Matches the country's numbering plan
+    - Has correct length for its type
+    - Could potentially be assigned
+    - Can receive calls or SMS
+  </Tab>
+  
+  <Tab title="Possible number">
+    ### Possible number check
+    
+    Determines if a number is **possible** within its country code:
+    
+    ```python
+    es_posible = phonenumbers.is_possible_number(phone_obj)
+    ```
+    
+    A possible number:
+    - Has valid length for the country
+    - May not follow all formatting rules
+    - Might not be assigned yet
+    - Could be invalid but structurally correct
+  </Tab>
+</Tabs>
+
+<Info>
+A number can be **possible** but not **valid** if it has correct length but doesn't match assignment patterns.
+</Info>
+
+## Input methods
+
+Users can input phone numbers in two ways:
+
+### Method 1: Complete number with country code
+
+```
++593 99 123 4567
+```
+
+The application automatically adds the `+` prefix if missing.
+
+### Method 2: Separated components
+
+```
+Country code: 593
+Number: 991234567
+```
+
+The application combines them as `+593991234567`.
+
+## Number formats
+
+The application converts any input into three standard formats:
+
+<Card title="Format types" icon="phone">
+  ### International format (E.123)
+  ```
+  +593 99 123 4567
+  ```
+  Human-readable format with country code and spacing.
+  
+  ### E.164 format
+  ```
+  +593991234567
+  ```
+  Machine-readable format used in APIs and databases. No spaces, dashes, or parentheses.
+  
+  ### National format
+  ```
+  099 123 4567
+  ```
+  Local format without country code, as dialed within the country.
+</Card>
+
+```python
+formato_internacional = phonenumbers.format_number(
+    phone_obj, phonenumbers.PhoneNumberFormat.INTERNATIONAL
+)
+formato_e164 = phonenumbers.format_number(
+    phone_obj, phonenumbers.PhoneNumberFormat.E164
+)
+formato_nacional = phonenumbers.format_number(
+    phone_obj, phonenumbers.PhoneNumberFormat.NATIONAL
+)
+```
+
+## Geographic information
+
+The feature extracts location data from the phone number:
+
+```python
+# Get location description in Spanish
+pais = geocoder.description_for_number(phone_obj, "es")
+# Get location description in English
+region = geocoder.description_for_number(phone_obj, "en")
+```
+
+**Example output:**
+- `country_code`: `593` (Ecuador)
+- `pais`: "Ecuador"
+- `region`: "Ecuador"
+- `national_number`: `991234567`
+
+<Tip>
+For mobile numbers, the geographic location often indicates where the number was registered, not the current user location.
+</Tip>
+
+## Carrier detection
+
+The application identifies the telecommunications carrier:
+
+```python
+operador = carrier.name_for_number(phone_obj, "es")
+```
+
+**Returns:** The carrier name in Spanish (e.g., "Claro", "Movistar", "CNT")
+
+**Limitations:**
+- Works best for mobile numbers
+- May return empty for landlines
+- Accuracy varies by country
+- Does not detect number portability
+
+## Number type detection
+
+The system classifies numbers into 11 types:
+
+```python
+tipo_numero = phonenumbers.number_type(phone_obj)
+
+tipos = {
+    0: "Fijo",              # Fixed line
+    1: "Móvil",             # Mobile
+    2: "Fijo o Móvil",      # Fixed line or mobile
+    3: "Gratuito",          # Toll-free
+    4: "Tarifa Premium",    # Premium rate
+    5: "Costo Compartido",  # Shared cost
+    6: "VoIP",              # VoIP
+    7: "Número Personal",   # Personal number
+    8: "Pager",             # Pager
+    9: "UAN",               # Universal Access Number
+    10: "Desconocido"       # Unknown
+}
+```
+
+<Info>
+Type detection helps determine expected behavior (SMS capability, call routing, pricing).
+</Info>
+
+## Timezone detection
+
+The feature identifies all possible timezones for a number:
+
+```python
+zonas_horarias = timezone.time_zones_for_number(phone_obj)
+```
+
+**Returns:** List of timezone identifiers (e.g., `["America/Guayaquil"]`)
+
+**Use cases:**
+- Scheduling calls at appropriate times
+- Displaying local time for the number
+- Understanding regional context
+
+<Tip>
+Some country codes span multiple timezones. The function returns all possibilities since it cannot determine the exact location without additional context.
+</Tip>
+
+## Implementation example
+
+```python
+def analizar_telefono():
+    """Analiza información de número telefónico"""
+    # User inputs number
+    numero_completo = input("Número completo (con +): ").strip()
+    
+    if not numero_completo.startswith('+'):
+        numero_completo = '+' + numero_completo
+    
+    try:
+        # Parse number
+        phone_obj = phonenumbers.parse(numero_completo)
+        
+        # Validation
+        es_valido = phonenumbers.is_valid_number(phone_obj)
+        es_posible = phonenumbers.is_possible_number(phone_obj)
+        
+        # Formats
+        formato_internacional = phonenumbers.format_number(
+            phone_obj, phonenumbers.PhoneNumberFormat.INTERNATIONAL
+        )
+        formato_e164 = phonenumbers.format_number(
+            phone_obj, phonenumbers.PhoneNumberFormat.E164
+        )
+        formato_nacional = phonenumbers.format_number(
+            phone_obj, phonenumbers.PhoneNumberFormat.NATIONAL
+        )
+        
+        # Geographic data
+        pais = geocoder.description_for_number(phone_obj, "es")
+        operador = carrier.name_for_number(phone_obj, "es")
+        zonas_horarias = timezone.time_zones_for_number(phone_obj)
+        
+        # Number type
+        tipo_numero = phonenumbers.number_type(phone_obj)
+        
+        # Save and display results
+        # ...
+        
+    except phonenumbers.phonenumberutil.NumberParseException as e:
+        print(f"Error al parsear número: {e}")
+```
+
+## Data structure
+
+The parsed phone object contains:
+
+```python
+phone_obj = phonenumbers.parse("+593991234567")
+
+# Accessible properties:
+phone_obj.country_code      # 593
+phone_obj.national_number   # 991234567
+```
+
+## Error handling
+
+The feature handles common parsing errors:
+
+- **NumberParseException**: Invalid format, missing country code
+- **Empty input**: Prompts for valid input
+- **Invalid country code**: Returns error message
+- **Too short/long**: Detected by validation checks
+
+<Card title="Example output" icon="file-lines">
+```
+Número válido: Sí
+Número posible: Sí
+
+Formato internacional: +593 99 123 4567
+Formato E.164: +593991234567
+Formato nacional: 099 123 4567
+
+País/Región: Ecuador
+Código de país: +593
+Número nacional: 991234567
+
+Operador: Claro
+Tipo de número: Móvil
+Zonas horarias: America/Guayaquil
+```
+</Card>

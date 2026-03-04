@@ -1,0 +1,273 @@
+---
+title: Output management
+description: Automatic file saving with timestamps, organized folder structure, and formatted text reports for all lookups
+---
+
+IP-Tracker automatically saves all lookup results to organized text files with timestamps, ensuring complete tracking history and easy result retrieval. Every query generates a formatted report stored in a dedicated folder structure.
+
+## Folder structure
+
+The application creates and manages a dedicated results folder:
+
+```python
+def crear_carpeta_resultados():
+    """Crea carpeta para guardar resultados"""
+    carpeta = "Resultados_Tracker"
+    if not os.path.exists(carpeta):
+        os.makedirs(carpeta)
+    return carpeta
+```
+
+<Card title="Directory structure" icon="folder-tree">
+```
+project-root/
+└── Resultados_Tracker/
+    ├── IP_8.8.8.8_20240315_143022.txt
+    ├── IP_8.8.8.8_metodo2_20240315_143045.txt
+    ├── Telefono_593991234567_20240315_144521.txt
+    └── ...
+```
+</Card>
+
+- **Folder name:** `Resultados_Tracker` (fixed name)
+- **Location:** Same directory as the script
+- **Auto-creation:** Created on first run and reused for all subsequent queries
+- **Persistence:** Never deleted by the application
+
+## File naming conventions
+
+Filenames follow specific patterns based on lookup type:
+
+<Tabs>
+  <Tab title="IP Method 1">
+    ### IP geolocation - Method 1
+    
+    **Pattern:** `IP_{ip_address}_{timestamp}.txt`
+    
+    **Example:** `IP_8.8.8.8_20240315_143022.txt`
+    
+    ```python
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    nombre_archivo = os.path.join(
+        carpeta, 
+        f"IP_{ip_address}_{timestamp}.txt"
+    )
+    ```
+  </Tab>
+  
+  <Tab title="IP Method 2">
+    ### IP geolocation - Method 2
+    
+    **Pattern:** `IP_{ip_address}_metodo2_{timestamp}.txt`
+    
+    **Example:** `IP_8.8.8.8_metodo2_20240315_143045.txt`
+    
+    ```python
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    nombre_archivo = os.path.join(
+        carpeta,
+        f"IP_{ip_address}_metodo2_{timestamp}.txt"
+    )
+    ```
+    
+    <Info>
+    The `_metodo2` suffix distinguishes between the two IP lookup methods.
+    </Info>
+  </Tab>
+  
+  <Tab title="Phone">
+    ### Phone number lookup
+    
+    **Pattern:** `Telefono_{country_code}{national_number}_{timestamp}.txt`
+    
+    **Example:** `Telefono_593991234567_20240315_144521.txt`
+    
+    ```python
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    nombre_archivo = os.path.join(
+        carpeta,
+        f"Telefono_{phone_obj.country_code}{phone_obj.national_number}_{timestamp}.txt"
+    )
+    ```
+    
+    <Info>
+    Phone filenames use the E.164 format (country code + national number) without the `+` symbol.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Timestamp format
+
+All timestamps use the same format:
+
+```python
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+```
+
+**Format breakdown:**
+- `YYYYMMDD`: Year, month, day (20240315)
+- `_`: Separator
+- `HHMMSS`: Hour, minute, second (143022)
+
+**Benefits:**
+- Sortable by filename (chronological order)
+- No spaces or special characters
+- Uniqueness (second-level precision)
+- Human-readable date/time
+
+<Tip>
+The timestamp format ensures files are automatically sorted by date when viewing the folder, with newest lookups appearing last.
+</Tip>
+
+## File format and structure
+
+All output files follow a consistent format with UTF-8 encoding:
+
+### IP geolocation file structure
+
+```python
+with open(nombre_archivo, "w", encoding="utf-8") as file:
+    file.write("="*60 + "\n")
+    file.write("INFORMACIÓN DE GEOLOCALIZACIÓN IP - MÉTODO 1\n")
+    file.write("="*60 + "\n\n")
+    file.write(f"Fecha de consulta: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    file.write(f"IP: {data.get('query', 'N/A')}\n")
+    file.write(f"País: {data.get('country', 'N/A')}\n")
+    file.write(f"Código de país: {data.get('countryCode', 'N/A')}\n")
+    # ... more fields
+    file.write(f"\nGoogle Maps: https://www.google.com/maps?q={lat},{lon}\n")
+```
+
+**Example output:**
+
+<Card title="IP_8.8.8.8_20240315_143022.txt" icon="file-lines">
+```
+============================================================
+INFORMACIÓN DE GEOLOCALIZACIÓN IP - MÉTODO 1
+============================================================
+
+Fecha de consulta: 2024-03-15 14:30:22
+IP: 8.8.8.8
+País: United States
+Código de país: US
+Región: California
+Ciudad: Mountain View
+Código postal: 94035
+Latitud: 37.386
+Longitud: -122.0838
+Zona horaria: America/Los_Angeles
+ISP: Google LLC
+Organización: Google Public DNS
+AS: AS15169 Google LLC
+
+Google Maps: https://www.google.com/maps?q=37.386,-122.0838
+```
+</Card>
+
+### Phone lookup file structure
+
+```python
+with open(nombre_archivo, "w", encoding="utf-8") as f:
+    f.write("="*60 + "\n")
+    f.write("ANÁLISIS DE NÚMERO TELEFÓNICO\n")
+    f.write("="*60 + "\n\n")
+    f.write(f"Fecha de consulta: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+    f.write(f"Número válido: {'Sí' if es_valido else 'No'}\n")
+    f.write(f"Número posible: {'Sí' if es_posible else 'No'}\n\n")
+    # ... more fields
+```
+
+**Example output:**
+
+<Card title="Telefono_593991234567_20240315_144521.txt" icon="file-lines">
+```
+============================================================
+ANÁLISIS DE NÚMERO TELEFÓNICO
+============================================================
+
+Fecha de consulta: 2024-03-15 14:45:21
+
+Número válido: Sí
+Número posible: Sí
+
+Formato internacional: +593 99 123 4567
+Formato E.164: +593991234567
+Formato nacional: 099 123 4567
+
+País/Región: Ecuador
+Región (EN): Ecuador
+Código de país: +593
+Número nacional: 991234567
+
+Operador: Claro
+Tipo de número: Móvil
+Zonas horarias: America/Guayaquil
+```
+</Card>
+
+## Console output
+
+In addition to file saving, results are displayed on the console with color formatting:
+
+```python
+# Success message in green
+print(f"\n{GREEN}[✓]{RESET} Resultados guardados en: {nombre_archivo}")
+print(f"{GREEN}[✓]{RESET} Ver en Google Maps: https://www.google.com/maps?q={lat},{lon}")
+```
+
+**Color codes:**
+- `GREEN`: Success messages, valid status
+- `RED`: Error messages, invalid status
+- `YELLOW`: Warnings, processing status
+- `BLUE`: Application banner
+- `BOLD`: Important information, prompts
+
+## Encoding
+
+All files use UTF-8 encoding to support international characters:
+
+```python
+with open(nombre_archivo, "w", encoding="utf-8") as file:
+```
+
+**Supports:**
+- International country/city names (España, São Paulo, 北京)
+- Special characters (accents, umlauts, tildes)
+- Phone number operators in native languages
+- Timezone names with special characters
+
+<Info>
+UTF-8 encoding ensures compatibility across all operating systems and text editors.
+</Info>
+
+## Automatic saving behavior
+
+- **No user confirmation required**: Files are saved automatically after successful query
+- **Overwrite protection**: Timestamp ensures unique filenames
+- **Silent creation**: Folder created without prompts
+- **Success notification**: Console displays full file path after saving
+- **Error handling**: If save fails, error is displayed but query continues
+
+## File organization best practices
+
+<Card title="Organizing results" icon="folder-open">
+  **Manual organization tips:**
+  
+  1. **By target:** Group files by IP address or phone number
+  2. **By date:** Use the timestamp to find recent lookups
+  3. **By type:** Separate IP and phone lookups into subfolders
+  4. **Archival:** Move old results to dated archive folders
+  
+  The consistent naming convention makes batch operations and scripting easy.
+</Card>
+
+## Storage considerations
+
+- **File size**: Each file is typically 1-2 KB
+- **Accumulation**: Files persist indefinitely
+- **Cleanup**: Manual deletion required (application never deletes files)
+- **Disk space**: Minimal impact even with thousands of lookups
+
+<Tip>
+**Tip:** The `Resultados_Tracker` folder can be backed up or synced to cloud storage for persistent tracking history across devices.
+</Tip>

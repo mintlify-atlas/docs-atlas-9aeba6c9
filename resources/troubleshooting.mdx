@@ -1,0 +1,375 @@
+---
+title: Troubleshooting
+description: Solutions to common issues when using IP-Tracker
+icon: wrench
+---
+
+This guide helps you resolve common problems encountered while using IP-Tracker.
+
+## Installation Issues
+
+### Python Version Incompatibility
+
+**Problem**: Script fails to run or shows syntax errors
+
+**Solution**: IP-Tracker requires Python 3.8 or higher.
+
+```bash
+# Check your Python version
+python3 --version
+
+# If version is too old, install Python 3.8+
+sudo apt update
+sudo apt install python3.8 python3-pip
+```
+
+### Missing Dependencies
+
+**Problem**: `ModuleNotFoundError` when running the script
+
+**Solution**: Install required Python packages:
+
+```bash
+pip3 install requests phonenumbers
+```
+
+<Info>
+  The main dependencies are:
+  - `requests` - For API calls
+  - `phonenumbers` - For phone number validation and analysis
+</Info>
+
+## IP Validation Errors
+
+### Invalid IP Address Format
+
+**Error Message**: `[!] Dirección IP inválida`
+
+**Cause**: The IP address doesn't match the expected format (XXX.XXX.XXX.XXX)
+
+**Solutions**:
+
+1. **Check Format**: Ensure the IP follows IPv4 format:
+   ```
+   ✅ Valid: 8.8.8.8, 192.168.1.1, 142.250.185.46
+   ❌ Invalid: 8.8.8, 192.168.1.256, 2001:db8::1 (IPv6)
+   ```
+
+2. **Validate Each Octet**: Each number must be between 0-255
+   ```python
+   # Valid range per octet: 0-255
+   ✅ 192.168.1.254
+   ❌ 192.168.1.256  # 256 exceeds maximum
+   ```
+
+3. **Remove Extra Spaces**: Trim whitespace before/after the IP
+   ```
+   ❌ " 8.8.8.8 "
+   ✅ "8.8.8.8"
+   ```
+
+### Private/Reserved IP Addresses
+
+**Error Message**: `[!] Error: IP inválida o privada`
+
+**Cause**: The API cannot geolocate private or reserved IP ranges
+
+**Private IP Ranges** (cannot be geolocated):
+- `10.0.0.0` - `10.255.255.255`
+- `172.16.0.0` - `172.31.255.255`
+- `192.168.0.0` - `192.168.255.255`
+- `127.0.0.0` - `127.255.255.255` (localhost)
+
+<Warning>
+  Geolocation APIs only work with **public IP addresses**. Private IPs (home/office networks) cannot be located.
+</Warning>
+
+## API Connection Errors
+
+### Timeout Errors
+
+**Error Message**: `[!] Error: Tiempo de espera agotado`
+
+**Causes & Solutions**:
+
+1. **Slow Internet Connection**
+   ```bash
+   # Test your connection
+   ping -c 4 8.8.8.8
+   
+   # Check DNS resolution
+   nslookup ip-api.com
+   ```
+
+2. **Firewall Blocking Requests**
+   ```bash
+   # Test API accessibility
+   curl -I http://ip-api.com/json/8.8.8.8
+   
+   # If blocked, check firewall rules
+   sudo ufw status
+   ```
+
+3. **Proxy Configuration** (if behind corporate proxy)
+   ```python
+   # Add proxy to tracker.py if needed
+   proxies = {
+       'http': 'http://proxy.example.com:8080',
+       'https': 'https://proxy.example.com:8080'
+   }
+   response = requests.get(url, timeout=10, proxies=proxies)
+   ```
+
+### Connection Refused
+
+**Error Message**: `[!] Error: No se pudo conectar al servidor`
+
+**Solutions**:
+
+1. **Check Internet Connection**
+   ```bash
+   ping google.com
+   ```
+
+2. **Verify DNS Resolution**
+   ```bash
+   nslookup ip-api.com
+   nslookup ipinfo.io
+   ```
+
+3. **Try Alternative Method**
+   - If Method 1 (ip-api.com) fails, try Method 2 (ipinfo.io)
+   - Or use option 3 to compare both
+
+### Rate Limit Exceeded
+
+**Error Message**: HTTP 429 or temporary failure
+
+**Cause**: API rate limits exceeded
+
+**Rate Limits**:
+- **ip-api.com**: 45 requests/minute (free tier)
+- **ipinfo.io**: 50,000 requests/month (free tier)
+
+**Solutions**:
+
+1. **Wait and Retry**: Wait 1-2 minutes before making more requests
+2. **Use Alternative API**: Switch between Method 1 and Method 2
+3. **Upgrade Plan**: Consider paid API plans for higher limits
+
+<Info>
+  For batch processing, add delays between requests:
+  ```python
+  import time
+  time.sleep(2)  # Wait 2 seconds between requests
+  ```
+</Info>
+
+## Phone Number Validation Errors
+
+### Invalid Phone Format
+
+**Error Message**: `[!] Error al parsear número: NumberParseException`
+
+**Causes & Solutions**:
+
+1. **Missing Country Code**
+   ```
+   ❌ 99 123 4567
+   ✅ +593 99 123 4567
+   ```
+
+2. **Invalid Country Code**
+   ```
+   ❌ +999 12345678  # Invalid code
+   ✅ +1 555 123 4567  # US number
+   ```
+
+3. **Wrong Format for Country**
+   ```python
+   # Each country has specific format rules
+   ✅ US: +1 555 123 4567
+   ✅ Ecuador: +593 99 123 4567
+   ✅ Spain: +34 612 34 56 78
+   ```
+
+### Number Not Valid
+
+**Result**: `[✗] Número no válido`
+
+**Meaning**: The number format is correct but the number itself isn't valid
+
+**Possible Reasons**:
+- Number range not assigned in that country
+- Incorrect digit count
+- Invalid area code
+
+<Warning>
+  A "possible" number means it matches the format, but "valid" means it could actually exist. Always check both indicators.
+</Warning>
+
+## Permission Errors
+
+### Cannot Create Results Directory
+
+**Error**: `Permission denied` when creating `Resultados_Tracker/`
+
+**Solutions**:
+
+1. **Check Current Directory Permissions**
+   ```bash
+   ls -la
+   ```
+
+2. **Run from Home Directory**
+   ```bash
+   cd ~/IP-Tracker
+   python3 tracker.py
+   ```
+
+3. **Fix Permissions** (if needed)
+   ```bash
+   chmod +w .
+   ```
+
+### Cannot Write Results Files
+
+**Error**: `Permission denied` when saving results
+
+**Solution**:
+```bash
+# Ensure results directory is writable
+chmod +w Resultados_Tracker/
+
+# Or remove and let script recreate it
+rm -rf Resultados_Tracker/
+```
+
+## Termux-Specific Issues
+
+### Package Installation Fails
+
+**Problem**: `pip3 install` fails on Termux
+
+**Solution**:
+```bash
+# Update Termux packages first
+pkg update && pkg upgrade
+
+# Install Python and dependencies
+pkg install python
+pip install --upgrade pip
+pip install requests phonenumbers
+```
+
+### Storage Permission Error
+
+**Problem**: Cannot save files on Android
+
+**Solution**:
+```bash
+# Grant storage permission in Termux
+termux-setup-storage
+
+# Run script from home directory
+cd ~
+cd IP-Tracker
+python tracker.py
+```
+
+<Info>
+  Termux requires explicit storage permissions to save files outside its app directory.
+</Info>
+
+## Display Issues
+
+### Colors Not Showing
+
+**Problem**: ANSI color codes display as plain text
+
+**Solutions**:
+
+1. **Terminal Support**: Use a terminal that supports ANSI colors:
+   - ✅ GNOME Terminal, Termux, iTerm2, Windows Terminal
+   - ❌ Very old terminal emulators
+
+2. **Force Color Mode** (in some environments):
+   ```bash
+   export TERM=xterm-256color
+   python3 tracker.py
+   ```
+
+### Clear Screen Not Working
+
+**Problem**: `limpiar_pantalla()` leaves artifacts
+
+**Solution**: The script auto-detects OS (`clear` for Linux/Mac, `cls` for Windows)
+
+```bash
+# Manually clear if needed
+clear  # Linux/Mac
+cls    # Windows
+```
+
+## Results File Issues
+
+### Files Not Generated
+
+**Problem**: No output files created in `Resultados_Tracker/`
+
+**Checklist**:
+
+1. ✅ Query completed successfully (green checkmark shown)
+2. ✅ Directory exists and is writable
+3. ✅ No disk space issues: `df -h`
+4. ✅ Check exact error messages
+
+### Cannot Read Results Files
+
+**Problem**: Files contain garbled text
+
+**Solution**: Files are UTF-8 encoded
+```bash
+# Open with UTF-8 encoding
+cat Resultados_Tracker/IP_8.8.8.8_*.txt
+
+# Or use a text editor with UTF-8 support
+nano Resultados_Tracker/IP_8.8.8.8_*.txt
+```
+
+## Getting Help
+
+If your issue isn't covered here:
+
+### 1. Check Error Messages
+
+The script provides specific error messages - read them carefully for clues.
+
+### 2. Enable Debug Mode
+
+Modify the script to add debugging:
+```python
+import traceback
+
+try:
+    # problematic code
+except Exception as e:
+    traceback.print_exc()  # Full error details
+```
+
+### 3. Report Issues
+
+<Card title="GitHub Issues" icon="github" href="https://github.com/Devsebastian44/IP-Tracker/issues">
+  Report bugs or request features on the GitHub repository
+</Card>
+
+When reporting issues, include:
+- Operating system and version
+- Python version (`python3 --version`)
+- Full error message
+- Steps to reproduce
+- What you've already tried
+
+<Info>
+  For general Python help, consult the [Python documentation](https://docs.python.org/3/) or [Stack Overflow](https://stackoverflow.com/questions/tagged/python).
+</Info>

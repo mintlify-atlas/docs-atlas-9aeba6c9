@@ -1,0 +1,410 @@
+---
+title: 'Utility Functions'
+description: 'Helper functions for validation, file operations, and user interface'
+icon: 'wrench'
+---
+
+## validar_ip()
+
+Validates whether a string is a properly formatted IPv4 address with valid octets.
+
+### Function Signature
+
+```python
+def validar_ip(ip: str) -> bool
+```
+
+### Parameters
+
+<ParamField path="ip" type="string" required>
+  The IP address string to validate (e.g., "192.168.1.1")
+</ParamField>
+
+### Return Value
+
+<ResponseField name="is_valid" type="boolean">
+  Returns `True` if the IP address is valid, `False` otherwise.
+</ResponseField>
+
+### Validation Rules
+
+The function validates IP addresses using two checks:
+
+1. **Format validation**: Uses regex pattern `r'^(\d{1,3}\.){3}\d{1,3}$'` to ensure:
+   - Four numeric groups separated by dots
+   - Each group contains 1-3 digits
+
+2. **Range validation**: Ensures each octet is between 0-255
+
+### Code Example
+
+```python
+from tracker import validar_ip
+
+# Valid IP addresses
+print(validar_ip("192.168.1.1"))      # True
+print(validar_ip("8.8.8.8"))          # True
+print(validar_ip("255.255.255.255"))  # True
+print(validar_ip("0.0.0.0"))          # True
+
+# Invalid IP addresses
+print(validar_ip("256.1.1.1"))        # False - Octet > 255
+print(validar_ip("192.168.1"))        # False - Only 3 octets
+print(validar_ip("192.168.1.1.1"))    # False - 5 octets
+print(validar_ip("abc.def.ghi.jkl"))  # False - Not numeric
+print(validar_ip("192.168.-1.1"))     # False - Negative octet
+print(validar_ip("192.168.1.01"))     # True - Leading zeros allowed
+
+# Usage in validation flow
+ip_input = input("Ingrese dirección IP: ")
+
+if validar_ip(ip_input):
+    # Proceed with geolocation
+    geolocalizar_ip_metodo1(ip_input)
+else:
+    print("Dirección IP inválida")
+```
+
+### Implementation Details
+
+Source code from tracker.py:39-45:
+
+```python
+def validar_ip(ip):
+    """Valida formato de dirección IP"""
+    patron = r'^(\d{1,3}\.){3}\d{1,3}$'
+    if re.match(patron, ip):
+        octetos = ip.split('.')
+        return all(0 <= int(octeto) <= 255 for octeto in octetos)
+    return False
+```
+
+---
+
+## validar_telefono()
+
+Validates international phone numbers using the phonenumbers library. See [Phone Methods](/api/phone-methods#validar_telefono) for detailed documentation.
+
+---
+
+## crear_carpeta_resultados()
+
+Creates the results directory for storing analysis output files. This function is called automatically by geolocation and phone analysis functions.
+
+### Function Signature
+
+```python
+def crear_carpeta_resultados() -> str
+```
+
+### Parameters
+
+This function takes no parameters.
+
+### Return Value
+
+<ResponseField name="carpeta" type="string">
+  Returns the name of the created directory: `"Resultados_Tracker"`
+</ResponseField>
+
+### Behavior
+
+- Checks if `Resultados_Tracker/` directory exists in the current working directory
+- Creates the directory if it doesn't exist using `os.makedirs()`
+- Does nothing if the directory already exists (no error thrown)
+- Returns the directory name regardless of whether it was created or already existed
+
+### Code Example
+
+```python
+from tracker import crear_carpeta_resultados
+import os
+
+# Create results directory
+carpeta = crear_carpeta_resultados()
+print(f"Carpeta: {carpeta}")  # Output: Carpeta: Resultados_Tracker
+
+# Verify directory exists
+if os.path.exists(carpeta):
+    print(f"Directorio '{carpeta}' está listo")
+
+# Save a custom file to the results directory
+ruta_archivo = os.path.join(carpeta, "mi_resultado.txt")
+with open(ruta_archivo, "w") as f:
+    f.write("Mis datos personalizados")
+```
+
+### Implementation Details
+
+Source code from tracker.py:32-37:
+
+```python
+def crear_carpeta_resultados():
+    """Crea carpeta para guardar resultados"""
+    carpeta = "Resultados_Tracker"
+    if not os.path.exists(carpeta):
+        os.makedirs(carpeta)
+    return carpeta
+```
+
+### Usage in Other Functions
+
+This function is called internally by:
+- `geolocalizar_ip_metodo1()` - Line 76
+- `geolocalizar_ip_metodo2()` - Line 148
+- `analizar_telefono()` - Line 273
+
+---
+
+## limpiar_pantalla()
+
+Clears the terminal screen in a cross-platform manner.
+
+### Function Signature
+
+```python
+def limpiar_pantalla() -> None
+```
+
+### Parameters
+
+This function takes no parameters.
+
+### Return Value
+
+<ResponseField name="return" type="None">
+  This function does not return a value.
+</ResponseField>
+
+### Behavior
+
+- Detects the operating system using `os.name`
+- On Windows (`os.name == "nt"`): Executes `cls` command
+- On Unix/Linux/Mac: Executes `clear` command
+
+### Code Example
+
+```python
+from tracker import limpiar_pantalla
+
+# Clear screen before showing menu
+limpiar_pantalla()
+print("MENÚ PRINCIPAL")
+print("1. Opción 1")
+print("2. Opción 2")
+
+# Clear screen after operation
+print("Procesando...")
+import time
+time.sleep(2)
+limpiar_pantalla()
+print("Operación completada")
+```
+
+### Implementation Details
+
+Source code from tracker.py:17-19:
+
+```python
+def limpiar_pantalla():
+    """Limpia la pantalla de forma multiplataforma"""
+    os.system("cls" if os.name == "nt" else "clear")
+```
+
+### Platform Compatibility
+
+| Platform | Command Used | `os.name` Value |
+|----------|--------------|------------------|
+| Windows | `cls` | `"nt"` |
+| Linux | `clear` | `"posix"` |
+| macOS | `clear` | `"posix"` |
+| Unix | `clear` | `"posix"` |
+
+---
+
+## pausar()
+
+Pauses execution and waits for user to press Enter before continuing. Used to keep results visible on screen.
+
+### Function Signature
+
+```python
+def pausar() -> None
+```
+
+### Parameters
+
+This function takes no parameters.
+
+### Return Value
+
+<ResponseField name="return" type="None">
+  This function does not return a value.
+</ResponseField>
+
+### Behavior
+
+- Displays the prompt: `[Presiona ENTER para continuar...]` in bold text
+- Waits for user to press Enter/Return key
+- Returns control to the calling function after Enter is pressed
+
+### Code Example
+
+```python
+from tracker import pausar
+
+# Show results and wait
+print("Operación completada exitosamente")
+print("Resultados guardados en archivo.txt")
+pausar()  # Wait for user acknowledgment
+
+# Continue with next operation
+print("Continuando...")
+
+# Use in error handling
+try:
+    resultado = geolocalizar_ip_metodo1(ip)
+    if resultado:
+        print("Geolocalización exitosa")
+    else:
+        print("Error en la geolocalización")
+except Exception as e:
+    print(f"Error: {e}")
+finally:
+    pausar()  # Always pause before returning to menu
+```
+
+### Implementation Details
+
+Source code from tracker.py:55-57:
+
+```python
+def pausar():
+    """Pausa para que el usuario pueda leer los resultados"""
+    input(f"\n{BOLD}[Presiona ENTER para continuar...]{RESET}")
+```
+
+### ANSI Color Codes Used
+
+- `BOLD` = `'\033[1m'` - Bold text
+- `RESET` = `'\033[0m'` - Reset formatting
+
+---
+
+## banner()
+
+Displays the application banner/logo in ASCII art with colored output.
+
+### Function Signature
+
+```python
+def banner() -> None
+```
+
+### Parameters
+
+This function takes no parameters.
+
+### Return Value
+
+<ResponseField name="return" type="None">
+  This function does not return a value.
+</ResponseField>
+
+### Behavior
+
+- Prints ASCII art logo reading "IP-Tracker"
+- Uses blue color (`\033[34m`) for the banner text
+- Adds blank lines before and after for spacing
+
+### Code Example
+
+```python
+from tracker import banner, limpiar_pantalla
+
+# Show banner at application start
+limpiar_pantalla()
+banner()
+print("Bienvenido a IP-Tracker")
+print("Versión 1.0")
+
+# Use in main menu
+def mostrar_menu():
+    limpiar_pantalla()
+    banner()
+    print("MENÚ PRINCIPAL")
+    print("[1] Geolocalización IP")
+    print("[2] Análisis de teléfono")
+    print("[3] Salir")
+```
+
+### Implementation Details
+
+Source code from tracker.py:21-30:
+
+```python
+def banner():
+    """Muestra el banner de la aplicación"""
+    print("")
+    print(f"{BLUE} ._____________        ___________                     __                  {RESET}")
+    print(f"{BLUE} |   \______   \       \__    ___/___________    ____ |  | __ ___________  {RESET}")
+    print(f"{BLUE} |   ||     ___/  ______ |    |  \_  __ \__  \ _/ ___|  |/ // __ \_  __ \ {RESET}")
+    print(f"{BLUE} |   ||    |     /_____/ |    |   |  | \// __ \\  \___|    <\  ___/|  | \/ {RESET}")
+    print(f"{BLUE} |___||____|             |____|   |__|  (____  /\___  >__|_ \\___  >__|    {RESET}")
+    print(f"{BLUE}                                             \/     \/     \/    \/        {RESET}")
+    print("")
+```
+
+### ANSI Color Codes
+
+The following color codes are defined in tracker.py:9-15:
+
+```python
+BLUE = '\033[34m'
+GREEN = '\033[32m'
+RED = '\033[31m'
+YELLOW = '\033[33m'
+RESET = '\033[0m'
+BOLD = '\033[1m'
+```
+
+### Visual Output
+
+When executed, the banner displays:
+
+```
+ ._____________        ___________                     __                  
+ |   \______   \       \__    ___/___________    ____ |  | __ ___________  
+ |   ||     ___/  ______ |    |  \_  __ \__  \ _/ ___|  |/ // __ \_  __ \ 
+ |   ||    |     /_____/ |    |   |  | \// __ \\  \___|    <\  ___/|  | \/ 
+ |___||____|             |____|   |__|  (____  /\___  >__|_ \\___  >__|    
+                                             \/     \/     \/    \/        
+```
+
+(In blue color when rendered in a terminal that supports ANSI codes)
+
+---
+
+## Color Constants
+
+The module defines ANSI escape codes for terminal colors:
+
+```python
+BLUE = '\033[34m'      # Used for banner and headers
+GREEN = '\033[32m'     # Used for success messages
+RED = '\033[31m'       # Used for error messages
+YELLOW = '\033[33m'    # Used for warnings and info
+RESET = '\033[0m'      # Resets color to default
+BOLD = '\033[1m'       # Bold text formatting
+```
+
+### Usage Example
+
+```python
+from tracker import GREEN, RED, YELLOW, RESET, BOLD
+
+print(f"{GREEN}[✓]{RESET} Operación exitosa")
+print(f"{RED}[!]{RESET} Error encontrado")
+print(f"{YELLOW}[*]{RESET} Procesando...")
+print(f"{BOLD}Texto en negrita{RESET}")
+```

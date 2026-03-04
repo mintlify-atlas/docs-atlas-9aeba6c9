@@ -1,0 +1,189 @@
+---
+title: IP geolocation
+description: Track and analyze IP addresses using two powerful geolocation APIs with detailed location data
+---
+
+IP-Tracker provides two independent IP geolocation methods that query different APIs to retrieve comprehensive geographic and network information about any IP address. Both methods automatically save results and provide Google Maps integration for visual location confirmation.
+
+## Available methods
+
+The application offers two geolocation APIs that can be used independently or compared side-by-side:
+
+<Tabs>
+  <Tab title="Method 1: ip-api.com">
+    ### Overview
+    The primary method uses the free ip-api.com service, which provides extensive information without strict rate limits for non-commercial use.
+
+    **API Endpoint:** `http://ip-api.com/json/{ip_address}`
+
+    ### Data fields returned
+
+    The API returns the following JSON structure:
+
+    ```json
+    {
+      "status": "success",
+      "query": "8.8.8.8",
+      "country": "United States",
+      "countryCode": "US",
+      "regionName": "California",
+      "city": "Mountain View",
+      "zip": "94035",
+      "lat": 37.386,
+      "lon": -122.0838,
+      "timezone": "America/Los_Angeles",
+      "isp": "Google LLC",
+      "org": "Google Public DNS",
+      "as": "AS15169 Google LLC"
+    }
+    ```
+
+    ### Implementation
+
+    ```python
+    def geolocalizar_ip_metodo1(ip_address):
+        """Método 1: Usando ip-api.com (gratuito, sin límite estricto)"""
+        url = f'http://ip-api.com/json/{ip_address}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            if data.get('status') == 'fail':
+                return None
+            
+            # Create timestamped file
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            nombre_archivo = f"IP_{ip_address}_{timestamp}.txt"
+            
+            # Save results with all fields
+            # Display on screen and return data
+            return data
+    ```
+
+    <Info>
+    This method provides the **most detailed information** including ISP, organization, and AS (Autonomous System) data.
+    </Info>
+  </Tab>
+
+  <Tab title="Method 2: ipinfo.io">
+    ### Overview
+    The alternative method uses ipinfo.io, a reliable service that provides clean, structured geolocation data.
+
+    **API Endpoint:** `https://ipinfo.io/{ip_address}/json`
+
+    ### Data fields returned
+
+    The API returns the following JSON structure:
+
+    ```json
+    {
+      "ip": "8.8.8.8",
+      "hostname": "dns.google",
+      "city": "Mountain View",
+      "region": "California",
+      "country": "US",
+      "postal": "94035",
+      "loc": "37.3860,-122.0840",
+      "org": "AS15169 Google LLC",
+      "timezone": "America/Los_Angeles"
+    }
+    ```
+
+    ### Implementation
+
+    ```python
+    def geolocalizar_ip_metodo2(ip_address):
+        """Método 2: Usando ipinfo.io"""
+        url = f"https://ipinfo.io/{ip_address}/json"
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            # Parse coordinates from "loc" field
+            loc = data.get('loc', ',').split(',')
+            latitude = loc[0] if len(loc) > 0 else 'N/A'
+            longitude = loc[1] if len(loc) > 1 else 'N/A'
+            
+            # Create timestamped file
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            nombre_archivo = f"IP_{ip_address}_metodo2_{timestamp}.txt"
+            
+            return data
+    ```
+
+    <Info>
+    This method includes the **hostname** field, which can reveal the DNS name associated with the IP address.
+    </Info>
+  </Tab>
+</Tabs>
+
+## IP validation
+
+Before querying any API, the application validates the IP address format:
+
+```python
+def validar_ip(ip):
+    """Valida formato de dirección IP"""
+    patron = r'^(\d{1,3}\.){3}\d{1,3}$'
+    if re.match(patron, ip):
+        octetos = ip.split('.')
+        return all(0 <= int(octeto) <= 255 for octeto in octetos)
+    return False
+```
+
+This validation ensures:
+- Correct IPv4 format (four octets separated by dots)
+- Each octet is between 0 and 255
+- Prevents invalid queries and API errors
+
+## Comparison mode
+
+<Card title="Compare both methods" icon="code-compare">
+  Users can select option 3 to run both methods sequentially on the same IP address. This allows comparison of:
+  
+  - Data completeness between providers
+  - Coordinate accuracy differences
+  - ISP/organization naming variations
+  - Hostname availability (Method 2 only)
+  
+  Both results are saved in separate files with distinct naming patterns.
+</Card>
+
+## Google Maps integration
+
+Both methods automatically generate Google Maps URLs using the latitude and longitude coordinates:
+
+```
+https://www.google.com/maps?q={latitude},{longitude}
+```
+
+These URLs are included in:
+- The saved text file
+- The console output
+- Allowing immediate visual verification of the location
+
+<Tip>
+**Best practice:** Use Method 1 for detailed ISP/AS information and Method 2 when you need hostname resolution. For critical lookups, use comparison mode to verify consistency.
+</Tip>
+
+## Error handling
+
+The implementation includes robust error handling for:
+
+- **Timeout errors** (10-second timeout per request)
+- **Connection errors** (network issues)
+- **Invalid IPs** (private ranges, malformed addresses)
+- **API failures** (status codes, rate limits)
+- **JSON parsing errors** (malformed responses)
+
+## Data accuracy
+
+<Info>
+Geolocation accuracy varies by IP type:
+- **Data center IPs** (like 8.8.8.8): City-level accuracy
+- **Residential IPs**: Can be accurate to neighborhood level
+- **Mobile IPs**: Typically show carrier's regional hub location
+- **VPN/Proxy IPs**: Show VPN server location, not user location
+</Info>

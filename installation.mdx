@@ -1,0 +1,219 @@
+---
+title: Installation
+description: System requirements and installation steps for IP-Tracker
+---
+
+This guide will walk you through installing IP-Tracker and all required dependencies.
+
+## System requirements
+
+<CardGroup cols={2}>
+  <Card title="Operating system" icon="linux">
+    Linux (Ubuntu/Kali recommended) or Termux on Android
+  </Card>
+  <Card title="Python version" icon="python">
+    Python 3.8 or higher
+  </Card>
+</CardGroup>
+
+<Note>
+While IP-Tracker is designed for Linux environments, it should work on macOS and Windows with Python 3.8+ installed. The color output works best on Unix-like terminals.
+</Note>
+
+## Dependencies
+
+IP-Tracker requires the following Python packages:
+
+- **requests**: HTTP library for API calls to ip-api.com and ipinfo.io
+- **phonenumbers**: Google's libphonenumber library for phone number parsing and validation
+
+The tool also uses these standard library modules (no installation required):
+- `os`, `sys`, `re`, `datetime`
+
+## Installation steps
+
+<Steps>
+  <Step title="Verify Python installation">
+    Ensure Python 3.8 or higher is installed:
+    
+    ```bash
+    python3 --version
+    ```
+    
+    Expected output:
+    ```bash
+    Python 3.8.0  # or higher
+    ```
+    
+    <Warning>
+    If Python 3.8+ is not installed, install it first:
+    
+    **Ubuntu/Debian:**
+    ```bash
+    sudo apt update
+    sudo apt install python3 python3-pip
+    ```
+    
+    **Termux (Android):**
+    ```bash
+    pkg update
+    pkg install python
+    ```
+    </Warning>
+  </Step>
+  
+  <Step title="Clone the repository">
+    Clone the IP-Tracker repository from GitHub:
+    
+    ```bash
+    git clone https://github.com/Devsebastian44/IP-Tracker.git
+    cd IP-Tracker
+    ```
+    
+    This will download all necessary files including the main `tracker.py` script.
+  </Step>
+  
+  <Step title="Install Python dependencies">
+    Install the required packages using pip:
+    
+    ```bash
+    pip3 install requests phonenumbers
+    ```
+    
+    Or install them individually:
+    
+    ```bash
+    pip3 install requests
+    pip3 install phonenumbers
+    ```
+    
+    <Note>
+    If you encounter permission errors, try using `--user` flag:
+    ```bash
+    pip3 install --user requests phonenumbers
+    ```
+    </Note>
+  </Step>
+  
+  <Step title="Verify installation">
+    Check that all dependencies are installed correctly:
+    
+    ```bash
+    python3 -c "import requests, phonenumbers; print('All dependencies installed successfully')"
+    ```
+    
+    If successful, you should see:
+    ```bash
+    All dependencies installed successfully
+    ```
+  </Step>
+  
+  <Step title="Run IP-Tracker">
+    Launch the tool:
+    
+    ```bash
+    python3 tracker.py
+    ```
+    
+    You should see the IP-Tracker banner and main menu. The tool will automatically create a `Resultados_Tracker` directory for storing results.
+  </Step>
+</Steps>
+
+## Directory structure
+
+After installation and first run, your directory structure will look like this:
+
+```
+IP-Tracker/
+├── tracker.py              # Main script
+├── README.md               # Documentation
+├── Img/                    # Screenshots and images
+└── Resultados_Tracker/     # Created automatically
+    ├── IP_8.8.8.8_20260304_143022.txt
+    └── Telefono_593991234567_20260304_143156.txt
+```
+
+<Note>
+The `Resultados_Tracker` directory is created automatically on first run. All query results are saved here with timestamped filenames.
+</Note>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="ModuleNotFoundError: No module named 'requests'">
+    The `requests` library is not installed. Run:
+    ```bash
+    pip3 install requests
+    ```
+    
+    If using a virtual environment, ensure it's activated before installing packages.
+  </Accordion>
+  
+  <Accordion title="ModuleNotFoundError: No module named 'phonenumbers'">
+    The `phonenumbers` library is not installed. Run:
+    ```bash
+    pip3 install phonenumbers
+    ```
+  </Accordion>
+  
+  <Accordion title="Permission denied when running script">
+    Make the script executable:
+    ```bash
+    chmod +x tracker.py
+    ```
+    
+    Or run with `python3` explicitly:
+    ```bash
+    python3 tracker.py
+    ```
+  </Accordion>
+  
+  <Accordion title="Colors not displaying correctly">
+    IP-Tracker uses ANSI color codes. If colors don't display:
+    - Ensure you're using a terminal that supports ANSI colors
+    - On Windows, use Windows Terminal or WSL
+    - The tool will still work without colors
+  </Accordion>
+  
+  <Accordion title="API timeout errors">
+    If you see timeout errors:
+    - Check your internet connection
+    - The tool uses a 10-second timeout for API calls
+    - Some networks may block HTTP requests to external APIs
+    - Try using a different network or VPN
+  </Accordion>
+</AccordionGroup>
+
+## Environment-specific notes
+
+### Termux (Android)
+
+For Termux users on Android:
+
+```bash
+# Install dependencies
+pkg update && pkg upgrade
+pkg install python git
+pip install requests phonenumbers
+
+# Clone and run
+git clone https://github.com/Devsebastian44/IP-Tracker.git
+cd IP-Tracker
+python tracker.py
+```
+
+### Kali Linux
+
+Kali Linux typically has Python pre-installed:
+
+```bash
+sudo apt update
+sudo apt install python3-pip
+pip3 install requests phonenumbers
+```
+
+## Next steps
+
+<Card title="Quick start guide" icon="rocket" href="/quickstart">
+  Learn how to perform your first IP lookup and phone number analysis
+</Card>

@@ -1,0 +1,333 @@
+---
+title: 'Phone Number Analysis'
+description: 'Functions for analyzing and validating international phone numbers'
+icon: 'phone'
+---
+
+## analizar_telefono()
+
+Interactive function that analyzes international phone numbers and extracts comprehensive information including carrier, location, validity, and formatting.
+
+### Function Signature
+
+```python
+def analizar_telefono() -> None
+```
+
+### Parameters
+
+This function takes no parameters. It prompts the user interactively for input.
+
+### Input Methods
+
+The function supports two input methods:
+
+<ParamField path="Option 1" type="string">
+  **Complete number with country code**
+  
+  User enters the full international number with + prefix (e.g., "+593 99 123 4567")
+</ParamField>
+
+<ParamField path="Option 2" type="string">
+  **Separate parts**
+  
+  User enters country code and number separately:
+  - Country code without + (e.g., "593")
+  - Phone number (e.g., "991234567")
+</ParamField>
+
+### Input Format Examples
+
+```python
+# Valid input formats
+"+1 650 253 0000"        # US number
+"+44 20 7031 3000"       # UK number
+"+593 99 123 4567"       # Ecuador number
+"+86 138 0013 8000"      # China number
+"+52 55 1234 5678"       # Mexico number
+```
+
+### Return Value
+
+<ResponseField name="return" type="None">
+  This function does not return a value. It prints results to the console and saves them to a file.
+</ResponseField>
+
+### Output Data
+
+The function extracts and displays the following information:
+
+#### Validation Status
+
+<ResponseField name="es_valido" type="boolean">
+  Whether the number is valid according to phone number rules. Displayed with green checkmark (✓) or red cross (✗).
+</ResponseField>
+
+<ResponseField name="es_posible" type="boolean">
+  Whether the number is possible (has correct length). Displayed with green checkmark (✓) or yellow warning (!).
+</ResponseField>
+
+#### Number Formats
+
+<ResponseField name="formato_internacional" type="string">
+  International format (e.g., "+1 650-253-0000")
+</ResponseField>
+
+<ResponseField name="formato_e164" type="string">
+  E.164 format - standardized international format (e.g., "+16502530000")
+</ResponseField>
+
+<ResponseField name="formato_nacional" type="string">
+  National format as dialed within the country (e.g., "(650) 253-0000")
+</ResponseField>
+
+#### Geographic Information
+
+<ResponseField name="pais" type="string">
+  Country or region name in Spanish (from geocoder)
+</ResponseField>
+
+<ResponseField name="region" type="string">
+  Region name in English (from geocoder)
+</ResponseField>
+
+<ResponseField name="country_code" type="integer">
+  Numeric country calling code (e.g., 1 for US, 44 for UK)
+</ResponseField>
+
+<ResponseField name="national_number" type="integer">
+  The national number portion without country code
+</ResponseField>
+
+#### Carrier Information
+
+<ResponseField name="operador" type="string">
+  Mobile carrier/operator name in Spanish. Returns "Desconocido" if not found.
+</ResponseField>
+
+#### Number Type
+
+<ResponseField name="tipo_numero" type="integer">
+  Numeric type code from phonenumbers library:
+  
+  - **0**: Fijo (Fixed line)
+  - **1**: Móvil (Mobile)
+  - **2**: Fijo o Móvil (Fixed line or mobile)
+  - **3**: Gratuito (Toll-free)
+  - **4**: Tarifa Premium (Premium rate)
+  - **5**: Costo Compartido (Shared cost)
+  - **6**: VoIP
+  - **7**: Número Personal (Personal number)
+  - **8**: Pager
+  - **9**: UAN (Universal Access Number)
+  - **10**: Desconocido (Unknown)
+</ResponseField>
+
+#### Timezone
+
+<ResponseField name="zonas_horarias" type="list[string]">
+  List of timezone identifiers for the phone number's location (e.g., ["America/New_York", "America/Detroit"])
+</ResponseField>
+
+### Code Example
+
+```python
+from tracker import analizar_telefono
+
+# Interactive analysis
+analizar_telefono()
+
+# User will be prompted:
+# [1] Ingresar número completo con código
+# [2] Ingresar por partes
+# Opción: 1
+# Número completo (con +): +1 650 253 0000
+
+# Output will show:
+# ✓ Número válido
+# ✓ Número posible
+# 
+# Formatos:
+#   Internacional: +1 650-253-0000
+#   E.164: +16502530000
+#   Nacional: (650) 253-0000
+# 
+# Ubicación:
+#   País/Región: Estados Unidos
+#   Código: +1
+# 
+# Información adicional:
+#   Operador: Desconocido
+#   Tipo: Fijo
+#   Zona horaria: America/Los_Angeles
+```
+
+### Side Effects
+
+- Creates `Resultados_Tracker/` directory if it doesn't exist
+- Saves detailed results to: `Telefono_{country_code}{national_number}_{timestamp}.txt`
+- Prints formatted output to console with colored text
+- Displays interactive prompts for user input
+- Calls `pausar()` at the end to wait for user acknowledgment
+
+### Validation Logic
+
+The function performs comprehensive validation:
+
+1. **Format validation**: Ensures the input can be parsed as a phone number
+2. **Validity check**: Uses phonenumbers library's `is_valid_number()` to check against numbering plans
+3. **Possibility check**: Uses `is_possible_number()` to verify the number length is possible
+
+### Exception Handling
+
+<ResponseField name="phonenumbers.phonenumberutil.NumberParseException" type="exception">
+  Raised when the phone number cannot be parsed. Function catches this and displays:
+  
+  `[!] Error al parsear número: {exception_message}`
+</ResponseField>
+
+<ResponseField name="Exception" type="exception">
+  Any other exception is caught and displayed as:
+  
+  `[!] Error: {exception_message}`
+</ResponseField>
+
+### Usage in Code
+
+```python
+# Direct call - interactive mode
+from tracker import analizar_telefono
+analizar_telefono()
+
+# For programmatic validation without user interaction,
+# use validar_telefono() instead
+from tracker import validar_telefono
+
+es_valido = validar_telefono("+1 650 253 0000")
+if es_valido:
+    print("Número válido")
+```
+
+---
+
+## validar_telefono()
+
+Validates whether a phone number is valid according to international numbering plans. This is a non-interactive utility function.
+
+### Function Signature
+
+```python
+def validar_telefono(numero_completo: str) -> bool
+```
+
+### Parameters
+
+<ParamField path="numero_completo" type="string" required>
+  Complete international phone number with country code. Should include + prefix (e.g., "+1 650 253 0000").
+</ParamField>
+
+### Return Value
+
+<ResponseField name="is_valid" type="boolean">
+  Returns `True` if the number is valid according to the phonenumbers library validation rules, `False` otherwise.
+</ResponseField>
+
+### Validation Process
+
+1. Parses the input string into a PhoneNumber object using `phonenumbers.parse()`
+2. Validates against international numbering plans using `phonenumbers.is_valid_number()`
+3. Returns `False` if any exception occurs during parsing or validation
+
+### Code Example
+
+```python
+from tracker import validar_telefono
+
+# Valid numbers
+print(validar_telefono("+1 650 253 0000"))      # True - US number
+print(validar_telefono("+44 20 7031 3000"))     # True - UK number
+print(validar_telefono("+593 99 123 4567"))     # True - Ecuador number
+
+# Invalid numbers
+print(validar_telefono("+1 123"))               # False - Too short
+print(validar_telefono("+999 123 456 7890"))    # False - Invalid country code
+print(validar_telefono("6502530000"))           # False - Missing country code
+print(validar_telefono("invalid"))              # False - Not a number
+
+# Usage in conditional logic
+numero = input("Ingrese número de teléfono: ")
+
+if validar_telefono(numero):
+    print("Número válido, procediendo con el análisis...")
+    # Continue with processing
+else:
+    print("Número inválido, por favor verifique el formato")
+```
+
+### Exception Handling
+
+<ResponseField name="Exception" type="exception">
+  Any exception during parsing or validation is caught silently and the function returns `False`. This includes:
+  
+  - `NumberParseException` - Invalid format or unparseable input
+  - `AttributeError` - None or invalid type passed
+  - Any other exception from the phonenumbers library
+</ResponseField>
+
+### Best Practices
+
+1. **Always include the + prefix** in the phone number string
+2. **Validate before analysis** - Use this function before calling `analizar_telefono()` programmatically
+3. **Handle False gracefully** - Provide user feedback when validation fails
+4. **Use for bulk validation** - This function is suitable for validating lists of numbers
+
+### Integration Example
+
+```python
+from tracker import validar_telefono, analizar_telefono
+
+def procesar_numeros(lista_numeros):
+    """Process a list of phone numbers"""
+    validos = []
+    invalidos = []
+    
+    for numero in lista_numeros:
+        if validar_telefono(numero):
+            validos.append(numero)
+        else:
+            invalidos.append(numero)
+    
+    print(f"Números válidos: {len(validos)}")
+    print(f"Números inválidos: {len(invalidos)}")
+    
+    return validos, invalidos
+
+# Example usage
+numeros = [
+    "+1 650 253 0000",
+    "+44 20 7031 3000",
+    "invalid-number",
+    "+593 99 123 4567"
+]
+
+validos, invalidos = procesar_numeros(numeros)
+print(f"Números válidos: {validos}")
+print(f"Números inválidos: {invalidos}")
+```
+
+## Dependencies
+
+Both phone methods require the `phonenumbers` library:
+
+```bash
+pip install phonenumbers
+```
+
+The library provides:
+- `phonenumbers.parse()` - Parse string to PhoneNumber object
+- `phonenumbers.is_valid_number()` - Validate against numbering plans
+- `phonenumbers.is_possible_number()` - Check if length is possible
+- `phonenumbers.format_number()` - Format in various standards
+- `geocoder` - Geographic location information
+- `carrier` - Mobile carrier/operator information
+- `timezone` - Timezone information for the number

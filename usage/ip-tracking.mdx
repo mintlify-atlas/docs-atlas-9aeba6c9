@@ -1,0 +1,221 @@
+---
+title: 'IP Address Tracking'
+description: 'Step-by-step guide for tracking and geolocating IP addresses'
+---
+
+# IP Address Tracking
+
+Learn how to use IP-Tracker to geotag IP addresses and retrieve detailed geolocation information using two different API providers.
+
+## Accessing the IP Tracking Menu
+
+<Steps>
+  <Step title="Launch the application">
+    When you start IP-Tracker, you'll see the main banner:
+    
+    ```
+     ._____________        ___________                     __                  
+     |   \______   \       \__    ___/___________    ____ |  | __ ___________  
+     |   ||     ___/  ______ |    |  \_  __ \__  \ _/ ___|  |/ // __ \_  __ \ 
+     |   ||    |     /_____/ |    |   |  | \// __ \\  \___|    <\  ___/|  | \/ 
+     |___||____|             |____|   |__|  (____  /\___  >__|_ \\___  >__|    
+                                                 \/     \/     \/    \/        
+    ```
+    
+    The main menu will display three options:
+    ```
+    [1] Obtener geolocalización de una IP
+    [2] Obtener información de número de teléfono
+    [3] Salir
+    ```
+  </Step>
+
+  <Step title="Select IP geolocation">
+    Enter `1` to access the IP tracking submenu. You'll see:
+    
+    ```
+    ============================================================
+    GEOLOCALIZACIÓN DE IP
+    ============================================================
+    
+    [1] Método 1 (ip-api.com) - Más información
+    [2] Método 2 (ipinfo.io) - Alternativo
+    [3] Comparar ambos métodos
+    [99] Volver al menú principal
+    ```
+  </Step>
+
+  <Step title="Choose tracking method">
+    Select your preferred method:
+    - **Option 1**: Uses ip-api.com (provides comprehensive information)
+    - **Option 2**: Uses ipinfo.io (alternative provider)
+    - **Option 3**: Compares both APIs side-by-side
+    - **Option 99**: Returns to main menu
+  </Step>
+
+  <Step title="Enter IP address">
+    When prompted, enter a valid IPv4 address:
+    
+    ```
+    Ingrese la dirección IP: 8.8.8.8
+    ```
+    
+    <Note>
+    The IP address must be in standard IPv4 format: four octets separated by dots (e.g., `8.8.8.8`, `192.168.1.1`)
+    </Note>
+  </Step>
+
+  <Step title="View results">
+    The tool will query the API and display results on screen, then automatically save them to a file.
+  </Step>
+</Steps>
+
+## Understanding the Results
+
+### Method 1 Output (ip-api.com)
+
+When using Method 1, you'll receive comprehensive geolocation data:
+
+```
+============================================================
+RESULTADOS DE GEOLOCALIZACIÓN
+============================================================
+IP: 8.8.8.8
+País: United States (US)
+Región: California
+Ciudad: Mountain View
+Código postal: 94035
+Coordenadas: 37.386, -122.0838
+Zona horaria: America/Los_Angeles
+ISP: Google LLC
+Organización: Google Public DNS
+
+[✓] Resultados guardados en: Resultados_Tracker/IP_8.8.8.8_20260304_143052.txt
+[✓] Ver en Google Maps: https://www.google.com/maps?q=37.386,-122.0838
+```
+
+**Key Information Provided:**
+- **IP**: The queried IP address
+- **País/Country**: Country name and ISO code
+- **Región**: State or region name
+- **Ciudad**: City name
+- **Código postal**: ZIP/postal code
+- **Coordenadas**: Latitude and longitude
+- **Zona horaria**: Time zone identifier
+- **ISP**: Internet Service Provider name
+- **Organización**: Organization owning the IP block
+- **AS**: Autonomous System information
+- **Google Maps link**: Direct link to view location
+
+### Method 2 Output (ipinfo.io)
+
+Method 2 provides similar information with some differences:
+
+```
+============================================================
+RESULTADOS DE GEOLOCALIZACIÓN
+============================================================
+IP: 8.8.8.8
+Hostname: dns.google
+Ciudad: Mountain View
+Región: California
+País: US
+Código postal: 94035
+Coordenadas: 37.4056, -122.0775
+Organización: AS15169 Google LLC
+Zona horaria: America/Los_Angeles
+
+[✓] Resultados guardados en: Resultados_Tracker/IP_8.8.8.8_metodo2_20260304_143127.txt
+[✓] Ver en Google Maps: https://www.google.com/maps?q=37.4056,-122.0775
+```
+
+**Additional Information:**
+- **Hostname**: Reverse DNS hostname (if available)
+- Results are saved with `_metodo2` suffix for easy differentiation
+
+## Valid IP Address Formats
+
+<Tip>
+**Examples of valid IP addresses:**
+- `8.8.8.8` (Google DNS)
+- `1.1.1.1` (Cloudflare DNS)
+- `208.67.222.222` (OpenDNS)
+- `142.250.185.46` (Public IP ranges)
+</Tip>
+
+<Warning>
+**Invalid formats that will be rejected:**
+- `192.168.1.1` (Private IP ranges may work but return limited data)
+- `256.1.1.1` (Octets must be 0-255)
+- `8.8.8` (Missing octets)
+- `8.8.8.8.8` (Too many octets)
+- `8.8.8.a` (Non-numeric characters)
+</Warning>
+
+## Error Messages and Solutions
+
+### "Dirección IP inválida"
+**Cause**: The IP format doesn't match IPv4 standards or octets are out of range.
+
+**Solution**: Verify your IP follows the format `xxx.xxx.xxx.xxx` where each xxx is 0-255.
+
+### "IP inválida o privada"
+**Cause**: The API cannot geolocate private/reserved IP ranges (e.g., 192.168.x.x, 10.x.x.x).
+
+**Solution**: Use a public IP address. Private IPs don't have geographic location data.
+
+### "Tiempo de espera agotado"
+**Cause**: Network timeout (10 seconds) was reached.
+
+**Solution**: Check your internet connection and try again.
+
+### "No se pudo conectar al servidor"
+**Cause**: Cannot reach the API endpoint.
+
+**Solution**: Verify your internet connection is active and not blocking API requests.
+
+## Best Practices
+
+<Tip>
+**Tracking Unknown IPs:**
+1. Always use **Method 3** (comparison mode) when investigating unfamiliar IPs
+2. Cross-reference data from both APIs for accuracy
+3. Note that different APIs may provide slightly different coordinates
+4. Check the Google Maps link to verify location accuracy
+</Tip>
+
+<Tip>
+**Performance Tips:**
+- Method 1 (ip-api.com) has a rate limit of 45 requests/minute for free usage
+- Method 2 (ipinfo.io) has a limit of 50,000 requests/month for free tier
+- Use Method 3 sparingly as it counts toward both limits
+</Tip>
+
+<Tip>
+**Interpreting Results:**
+- ISP and Organization often differ: ISP is the provider, Organization owns the IP block
+- City-level accuracy is typically 90-95% for residential IPs
+- Data center IPs may show the DC location, not the user's location
+- Mobile IPs often show carrier headquarters, not device location
+</Tip>
+
+## Saved Results
+
+All results are automatically saved to the `Resultados_Tracker/` directory with timestamps:
+
+- **Method 1**: `IP_<address>_<timestamp>.txt`
+- **Method 2**: `IP_<address>_metodo2_<timestamp>.txt`
+
+Example filename: `IP_8.8.8.8_20260304_143052.txt`
+
+The files contain:
+- Full query timestamp
+- All geolocation data
+- Google Maps link for visualization
+- Formatted for easy reading and reporting
+
+## Navigation
+
+- Press `ENTER` after viewing results to continue
+- Enter `99` to return to the main menu
+- Press `CTRL+C` to exit the application at any time

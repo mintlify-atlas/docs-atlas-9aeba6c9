@@ -1,0 +1,541 @@
+---
+title: Frequently Asked Questions
+description: Common questions about IP-Tracker functionality, compatibility, and usage
+icon: circle-question
+---
+
+Find answers to the most commonly asked questions about IP-Tracker.
+
+## Compatibility
+
+<AccordionGroup>
+  <Accordion title="Which Linux distributions are supported?">
+    IP-Tracker works on any Linux distribution with Python 3.8 or higher:
+
+    **Recommended**:
+    - Ubuntu 20.04+ (tested and recommended)
+    - Kali Linux (pre-configured for security tools)
+    - Debian 10+
+    - Linux Mint 20+
+
+    **Also Compatible**:
+    - Fedora 34+
+    - Arch Linux
+    - CentOS 8+
+    - Pop!_OS
+    - Any distribution with Python 3.8+
+
+    **Installation varies by distro**:
+    ```bash
+    # Debian/Ubuntu/Kali
+    sudo apt install python3 python3-pip
+
+    # Fedora
+    sudo dnf install python3 python3-pip
+
+    # Arch
+    sudo pacman -S python python-pip
+    ```
+  </Accordion>
+
+  <Accordion title="Does IP-Tracker work on Termux (Android)?">
+    Yes! IP-Tracker is fully compatible with Termux on Android.
+
+    **Setup Instructions**:
+
+    1. **Install Termux** from [F-Droid](https://f-droid.org/en/packages/com.termux/) (not Google Play)
+
+    2. **Update packages**:
+       ```bash
+       pkg update && pkg upgrade
+       ```
+
+    3. **Install dependencies**:
+       ```bash
+       pkg install python git
+       pip install requests phonenumbers
+       ```
+
+    4. **Grant storage permission** (to save results):
+       ```bash
+       termux-setup-storage
+       ```
+
+    5. **Clone and run**:
+       ```bash
+       git clone https://github.com/Devsebastian44/IP-Tracker.git
+       cd IP-Tracker
+       python tracker.py
+       ```
+
+    <Info>
+      Termux on F-Droid is actively maintained. The Google Play version is outdated and may not work properly.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Can I run this on Windows or macOS?">
+    While IP-Tracker is designed for Linux, it can run on Windows and macOS with minor adjustments:
+
+    **Windows**:
+    ```bash
+    # Install Python from python.org
+    # Then in Command Prompt or PowerShell:
+    pip install requests phonenumbers
+    python tracker.py
+    ```
+
+    **macOS**:
+    ```bash
+    # Install Python 3 via Homebrew
+    brew install python3
+    pip3 install requests phonenumbers
+    python3 tracker.py
+    ```
+
+    <Warning>
+      Some ANSI color codes may not display correctly on older Windows terminals. Use Windows Terminal or WSL for best results.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="What are the minimum system requirements?">
+    IP-Tracker has very modest requirements:
+
+    **Minimum**:
+    - **OS**: Linux, macOS, Windows, or Android (via Termux)
+    - **Python**: 3.8 or higher
+    - **RAM**: 128 MB (minimal)
+    - **Storage**: 50 MB (including dependencies)
+    - **Internet**: Active connection for API calls
+
+    **Recommended**:
+    - **Python**: 3.10+
+    - **RAM**: 512 MB+
+    - **Terminal**: ANSI color support (for better display)
+  </Accordion>
+</AccordionGroup>
+
+## Functionality
+
+<AccordionGroup>
+  <Accordion title="Which APIs does IP-Tracker use?">
+    IP-Tracker uses two geolocation APIs and one phone number library:
+
+    ### IP Geolocation APIs
+
+    **Method 1: ip-api.com**
+    - **Endpoint**: `http://ip-api.com/json/{ip}`
+    - **Data Provided**: Country, region, city, coordinates, ISP, organization, timezone
+    - **Free Tier**: 45 requests/minute
+    - **Documentation**: [ip-api.com/docs](http://ip-api.com/docs)
+
+    **Method 2: ipinfo.io**
+    - **Endpoint**: `https://ipinfo.io/{ip}/json`
+    - **Data Provided**: Country, region, city, coordinates, hostname, organization, timezone
+    - **Free Tier**: 50,000 requests/month
+    - **Documentation**: [ipinfo.io/developers](https://ipinfo.io/developers)
+
+    ### Phone Number Library
+
+    **phonenumbers (Google libphonenumber)**
+    - **Type**: Offline Python library
+    - **Data**: Phone format validation, carrier, timezone, number type
+    - **Documentation**: [github.com/daviddrysdale/python-phonenumbers](https://github.com/daviddrysdale/python-phonenumbers)
+
+    <Info>
+      No API keys required for basic functionality. All services offer free tiers suitable for educational use.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Are there rate limits? How can I avoid them?">
+    Yes, both APIs have rate limits on their free tiers:
+
+    ### ip-api.com
+    - **Limit**: 45 requests per minute
+    - **Reset**: Every minute
+    - **Response**: HTTP 429 (Too Many Requests)
+
+    ### ipinfo.io
+    - **Limit**: 50,000 requests per month
+    - **Reset**: Monthly
+    - **Response**: Error in JSON response
+
+    ### Avoiding Rate Limits
+
+    1. **Add Delays** (for batch processing):
+       ```python
+       import time
+       time.sleep(2)  # Wait 2 seconds between requests
+       ```
+
+    2. **Switch APIs**: Use Method 2 if Method 1 is rate-limited
+
+    3. **Cache Results**: Don't query the same IP multiple times
+
+    4. **Upgrade Plan**: Consider paid tiers for heavy usage:
+       - ip-api.com: $13/month for 150k requests
+       - ipinfo.io: $249/month for 250k requests
+
+    <Warning>
+      Excessive requests may result in temporary IP bans. Always respect API terms of service.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="How accurate is the geolocation data?">
+    Geolocation accuracy varies depending on several factors:
+
+    ### Typical Accuracy Levels
+
+    | Level | Accuracy | Typical Use Case |
+    |-------|----------|------------------|
+    | Country | 95-99% | Almost always accurate |
+    | Region/State | 80-90% | Generally reliable |
+    | City | 55-80% | May show nearby city |
+    | Coordinates | ±25-50 km | Approximate area only |
+
+    ### Factors Affecting Accuracy
+
+    1. **IP Type**:
+       - ✅ **Static IPs**: More accurate (businesses, servers)
+       - ⚠️ **Dynamic IPs**: Less accurate (home users, mobile)
+
+    2. **ISP Database Updates**: 
+       - Accuracy depends on how recently ISPs updated their records
+       - Major ISPs update regularly; smaller ones may lag
+
+    3. **VPN/Proxy Detection**:
+       - VPNs/proxies show location of VPN server, not user
+       - Commercial VPNs often detected in "organization" field
+
+    4. **Mobile Networks**:
+       - May show carrier hub location, not actual device location
+       - Can vary as user moves between cell towers
+
+    <Info>
+      Coordinates typically point to the ISP's network center or approximate city center, **not** the exact device location. This is not GPS tracking.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Can I track someone's exact location with this tool?">
+    **No.** IP geolocation provides approximate location only, not GPS coordinates.
+
+    ### What You CAN Get:
+    - Approximate city/region (within 25-50 km)
+    - Country (highly accurate)
+    - ISP/Organization
+    - Timezone
+
+    ### What You CANNOT Get:
+    - Exact street address
+    - GPS coordinates
+    - Building/apartment number
+    - Real-time tracking
+
+    <Warning>
+      Using this tool to stalk, harass, or track individuals is **illegal and unethical**. IP geolocation is meant for network diagnostics, fraud detection, and security research only.
+    </Warning>
+
+    ### Legal Alternatives for Accurate Location:
+    - GPS tracking apps (requires device access)
+    - Mobile carrier triangulation (requires legal authority)
+    - Law enforcement warrants
+  </Accordion>
+
+  <Accordion title="What information can I get from phone numbers?">
+    IP-Tracker's phone analysis feature provides:
+
+    ### Validation Data
+    - **Validity**: Is the number format valid?
+    - **Possibility**: Could this number exist?
+    - **Formatted Output**: International, E.164, and national formats
+
+    ### Geographic Information
+    - **Country**: Country where number is registered
+    - **Region**: General region (if available)
+    - **Timezone**: Timezone(s) for that country/region
+
+    ### Carrier Information
+    - **Operator**: Mobile carrier name (when available)
+    - **Number Type**: Mobile, landline, VoIP, toll-free, etc.
+
+    ### What You DON'T Get:
+    - ❌ Owner's name
+    - ❌ Current location
+    - ❌ Call history
+    - ❌ Social media profiles
+    - ❌ Email address
+
+    <Info>
+      All phone analysis is done using the `phonenumbers` library, which uses public numbering plan data. It's completely offline and doesn't query any external services.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Where are results saved?">
+    Results are automatically saved to a local directory:
+
+    ### Save Location
+    ```
+    IP-Tracker/
+    └── Resultados_Tracker/
+        ├── IP_8.8.8.8_20250304_143052.txt
+        ├── IP_8.8.8.8_metodo2_20250304_143055.txt
+        └── Telefono_593991234567_20250304_143128.txt
+    ```
+
+    ### File Naming Convention
+    - **IP Queries**: `IP_{address}_{timestamp}.txt`
+    - **IP Method 2**: `IP_{address}_metodo2_{timestamp}.txt`
+    - **Phone Queries**: `Telefono_{country_code}{number}_{timestamp}.txt`
+    - **Timestamp Format**: `YYYYMMDD_HHMMSS`
+
+    ### File Contents
+    Each result file includes:
+    - Query timestamp
+    - Complete data from the API
+    - Google Maps link (for IP queries)
+    - Formatted output
+
+    <Warning>
+      Results contain personal/network information. Protect these files appropriately and delete them when no longer needed.
+    </Warning>
+  </Accordion>
+</AccordionGroup>
+
+## Privacy & Security
+
+<AccordionGroup>
+  <Accordion title="Is my query data stored or logged?">
+    ### By IP-Tracker (Local)
+    - ✅ **Results saved locally** in `Resultados_Tracker/`
+    - ✅ **No cloud upload** - everything stays on your device
+    - ✅ **No telemetry** - no data sent to developers
+    - ✅ **Open source** - verify the code yourself
+
+    ### By Third-Party APIs
+    - ⚠️ **ip-api.com**: May log queries (check their [privacy policy](http://ip-api.com/docs/legal))
+    - ⚠️ **ipinfo.io**: Logs API requests (check their [privacy policy](https://ipinfo.io/privacy-policy))
+
+    ### Best Practices
+    1. Don't query sensitive IPs you don't own
+    2. Use VPN if privacy is a concern
+    3. Delete result files when done
+    4. Consider self-hosting alternative APIs for maximum privacy
+  </Accordion>
+
+  <Accordion title="Can the APIs I query see my IP address?">
+    Yes, when you query ip-api.com or ipinfo.io, they can see:
+
+    - Your IP address (standard for any web request)
+    - The IP you're querying about
+    - Timestamp of your request
+    - User agent (Python requests library)
+
+    ### If This Concerns You:
+
+    1. **Use a VPN**: Route queries through a VPN server
+    2. **Use Tor**: Route through Tor network (slower)
+    3. **Self-Host**: Set up your own geolocation database
+    4. **Proxy**: Use a proxy server
+
+    <Info>
+      This is standard behavior for any web service. The APIs need your IP to send back responses.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Is it legal to use IP geolocation tools?">
+    **Generally yes**, but with important caveats:
+
+    ### Legal Uses ✅
+    - Analyzing your own network
+    - Security research with authorization
+    - Educational purposes
+    - Diagnosing network issues
+    - Fraud detection (with proper authority)
+
+    ### Illegal Uses ❌
+    - Stalking or harassment
+    - Unauthorized network scanning
+    - Identity theft
+    - Violating privacy laws (GDPR, CCPA, etc.)
+    - Any unauthorized access
+
+    ### Jurisdiction Matters
+    Laws vary by country and region. Some jurisdictions have strict privacy laws that may restrict OSINT activities.
+
+    <Warning>
+      **Always consult local laws** before conducting security research or OSINT. When in doubt, seek legal counsel.
+    </Warning>
+
+    See our [Legal Disclaimer](/resources/legal-disclaimer) for more information.
+  </Accordion>
+
+  <Accordion title="How can I protect my own IP from being tracked?">
+    If you're concerned about IP-based tracking:
+
+    ### 1. Use a VPN
+    ```bash
+    # Popular VPN providers:
+    # - ProtonVPN (free tier available)
+    # - Mullvad
+    # - IVPN
+    ```
+
+    ### 2. Use Tor Browser
+    - Download from [torproject.org](https://www.torproject.org/)
+    - Routes traffic through multiple encrypted nodes
+    - Slower but highly private
+
+    ### 3. Use Proxy Servers
+    - Configure system-wide or per-application
+    - Less secure than VPN but can hide IP
+
+    ### 4. Use Public Networks Carefully
+    - Your public WiFi location may be associated with your IP
+    - Use VPN on public networks
+
+    ### 5. Request Dynamic IP
+    - Contact your ISP to use dynamic IPs
+    - Changes regularly (but still traceable during usage)
+
+    <Info>
+      Remember: No method is 100% anonymous. Determined adversaries with legal authority can still potentially trace you.
+    </Info>
+  </Accordion>
+</AccordionGroup>
+
+## Usage & Best Practices
+
+<AccordionGroup>
+  <Accordion title="Should I use Method 1 or Method 2 for IP geolocation?">
+    Both methods have advantages:
+
+    ### Method 1 (ip-api.com)
+    **Pros**:
+    - More detailed information (AS number, more ISP data)
+    - Faster response times
+    - No account required
+
+    **Cons**:
+    - Lower rate limit (45/minute)
+    - HTTP only (not HTTPS)
+
+    **Best For**: Quick single queries, detailed ISP information
+
+    ### Method 2 (ipinfo.io)
+    **Pros**:
+    - Higher monthly limit (50k/month)
+    - HTTPS connection
+    - Includes hostname
+
+    **Cons**:
+    - Slightly less detailed
+    - Requires account for advanced features
+
+    **Best For**: Batch processing, higher volume
+
+    ### Recommendation
+    Use **Option 3: Compare both methods** for important queries to cross-verify data accuracy.
+  </Accordion>
+
+  <Accordion title="How can I automate bulk IP lookups?">
+    While IP-Tracker is designed for interactive use, you can modify it for automation:
+
+    ### Simple Automation Script
+    ```python
+    import time
+    from tracker import geolocalizar_ip_metodo1
+
+    ips = ["8.8.8.8", "1.1.1.1", "9.9.9.9"]
+
+    for ip in ips:
+        print(f"\nQuerying {ip}...")
+        geolocalizar_ip_metodo1(ip)
+        time.sleep(2)  # Respect rate limits
+    ```
+
+    ### Important Considerations
+    1. **Rate Limits**: Add delays between requests (2+ seconds)
+    2. **Error Handling**: Check for failures and retry
+    3. **API Terms**: Ensure bulk use complies with ToS
+    4. **Caching**: Store results to avoid duplicate queries
+
+    <Warning>
+      Aggressive automated querying may violate API terms of service and result in IP bans.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Can I contribute to IP-Tracker?">
+    Yes! IP-Tracker is open source under Apache 2.0 license.
+
+    ### Ways to Contribute
+
+    1. **Report Bugs**: Open issues on [GitHub](https://github.com/Devsebastian44/IP-Tracker/issues)
+    2. **Suggest Features**: Request features via GitHub issues
+    3. **Submit Pull Requests**: Fix bugs or add features
+    4. **Improve Documentation**: Help others understand the tool
+    5. **Share Knowledge**: Write tutorials or guides
+
+    ### Contributing Code
+    ```bash
+    # Fork the repository on GitHub
+    git clone https://github.com/YOUR_USERNAME/IP-Tracker.git
+    cd IP-Tracker
+    
+    # Create a feature branch
+    git checkout -b feature/your-feature
+    
+    # Make changes and commit
+    git add .
+    git commit -m "Add: your feature description"
+    
+    # Push and create pull request
+    git push origin feature/your-feature
+    ```
+
+    <Info>
+      Before contributing code, review the [Apache 2.0 license terms](https://www.apache.org/licenses/LICENSE-2.0) and ensure your contributions are compatible.
+    </Info>
+  </Accordion>
+
+  <Accordion title="What should I do if an API is down or unreliable?">
+    If you encounter API issues:
+
+    ### Immediate Solutions
+    1. **Switch APIs**: Try the alternative method (Method 1 ↔ Method 2)
+    2. **Check Status Pages**:
+       - ip-api.com: [status.ip-api.com](http://status.ip-api.com)
+       - ipinfo.io: [status.ipinfo.io](https://status.ipinfo.io)
+    3. **Wait and Retry**: Temporary outages usually resolve quickly
+
+    ### Long-Term Solutions
+    1. **Add More APIs**: Modify `tracker.py` to support additional services:
+       - ipapi.co
+       - ipgeolocation.io
+       - ipstack.com
+
+    2. **Self-Host Database**: Use MaxMind GeoLite2 (free) or GeoIP2 (paid):
+       ```python
+       import geoip2.database
+       reader = geoip2.database.Reader('GeoLite2-City.mmdb')
+       response = reader.city('8.8.8.8')
+       ```
+
+    3. **Cache Results**: Store recent queries locally to reduce API dependency
+  </Accordion>
+</AccordionGroup>
+
+## Still Have Questions?
+
+<CardGroup cols={2}>
+  <Card title="Troubleshooting Guide" icon="wrench" href="/resources/troubleshooting">
+    Solve common technical issues
+  </Card>
+  <Card title="Legal Disclaimer" icon="scale-balanced" href="/resources/legal-disclaimer">
+    Understand legal and ethical guidelines
+  </Card>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/Devsebastian44/IP-Tracker/issues">
+    Ask questions or report problems
+  </Card>
+  <Card title="Getting Started" icon="rocket" href="/quickstart">
+    New to IP-Tracker? Start here
+  </Card>
+</CardGroup>

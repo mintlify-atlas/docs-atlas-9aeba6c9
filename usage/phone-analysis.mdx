@@ -1,0 +1,334 @@
+---
+title: 'Phone Number Analysis'
+description: 'Step-by-step guide for analyzing phone numbers and retrieving carrier and location data'
+---
+
+# Phone Number Analysis
+
+IP-Tracker includes powerful phone number analysis capabilities to validate numbers, identify carriers, determine locations, and format numbers according to international standards.
+
+## Accessing Phone Analysis
+
+<Steps>
+  <Step title="Navigate from main menu">
+    From the main menu, select option `2`:
+    
+    ```
+    ============================================================
+    MENÚ PRINCIPAL
+    ============================================================
+    
+    [1] Obtener geolocalización de una IP
+    [2] Obtener información de número de teléfono
+    [3] Salir
+    
+    [+] Ingrese una opción: 2
+    ```
+  </Step>
+
+  <Step title="Choose input format">
+    You'll see the phone analysis menu:
+    
+    ```
+    ============================================================
+    ANÁLISIS DE NÚMERO TELEFÓNICO
+    ============================================================
+    
+    Ingresa el número de teléfono:
+    Ejemplo: +593 99 123 4567
+    O ingresa por partes:
+    
+    [1] Ingresar número completo con código
+    [2] Ingresar por partes
+    Opción:
+    ```
+    
+    Choose your preferred input method:
+    - **Option 1**: Enter the complete number with country code
+    - **Option 2**: Enter country code and number separately
+  </Step>
+
+  <Step title="Enter phone number">
+    
+    **Option 1 - Complete number:**
+    ```
+    Número completo (con +): +1 650 253 0000
+    ```
+    
+    **Option 2 - Separate parts:**
+    ```
+    Código de país (sin +): 1
+    Número: 6502530000
+    ```
+    
+    <Note>
+    If you forget the `+` prefix in Option 1, the tool will automatically add it for you.
+    </Note>
+  </Step>
+
+  <Step title="View analysis results">
+    The tool will parse and analyze the number, displaying comprehensive information about validity, format, carrier, and location.
+  </Step>
+</Steps>
+
+## Understanding Analysis Results
+
+### Sample Output
+
+Here's what a complete phone analysis looks like:
+
+```
+============================================================
+RESULTADOS DEL ANÁLISIS
+============================================================
+[✓] Número válido
+[✓] Número posible
+
+Formatos:
+  Internacional: +1 650-253-0000
+  E.164: +16502530000
+  Nacional: (650) 253-0000
+
+Ubicación:
+  País/Región: Estados Unidos
+  Código: +1
+
+Información adicional:
+  Operador: Google LLC
+  Tipo: Fijo o Móvil
+  Zona horaria: America/Los_Angeles
+
+[✓] Resultados guardados en: Resultados_Tracker/Telefono_16502530000_20260304_151823.txt
+```
+
+### Validation Status
+
+**Número válido (Valid Number)**
+- `[✓] Número válido`: The number is a valid, assignable phone number
+- `[✗] Número no válido`: The number format is incorrect or not assigned
+
+**Número posible (Possible Number)**
+- `[✓] Número posible`: The number length and format are possible for this country
+- `[!] Número no posible`: The number length is invalid for this country code
+
+<Note>
+A number can be "possible" but not "valid" - this means the format is correct but the number may not be currently assigned or in use.
+</Note>
+
+### Phone Number Formats
+
+The tool provides three standard format outputs:
+
+| Format | Description | Example | Use Case |
+|--------|-------------|---------|----------|
+| **Internacional** | Human-readable international format | +1 650-253-0000 | Display to users |
+| **E.164** | Standard machine format | +16502530000 | Database storage, APIs |
+| **Nacional** | Local format without country code | (650) 253-0000 | Local display |
+
+### Location Information
+
+**País/Región (Country/Region)**
+- Shows the country name in Spanish
+- May include region for specific area codes
+- Based on the country code prefix
+
+**Código de país (Country Code)**
+- The international dialing prefix (e.g., +1 for USA/Canada)
+
+### Carrier and Type
+
+**Operador (Carrier)**
+- Mobile network operator or telephone company
+- Shows "Desconocido" (Unknown) if not available
+- Not all countries/numbers have carrier data
+
+**Tipo de número (Number Type)**
+The tool identifies these number types:
+
+| Type | Spanish | Description |
+|------|---------|-------------|
+| Fixed Line | Fijo | Traditional landline |
+| Mobile | Móvil | Mobile/cell phone |
+| Fixed or Mobile | Fijo o Móvil | Could be either |
+| Toll-Free | Gratuito | Free to call (800, 888, etc.) |
+| Premium Rate | Tarifa Premium | Paid services (900, etc.) |
+| Shared Cost | Costo Compartido | Split billing |
+| VoIP | VoIP | Internet phone service |
+| Personal | Número Personal | Personal number service |
+| Pager | Pager | Pager device |
+| UAN | UAN | Universal Access Number |
+| Unknown | Desconocido | Type cannot be determined |
+
+### Time Zone
+
+Shows the IANA time zone identifier(s) for the number's region:
+- Example: `America/Los_Angeles`, `Europe/Madrid`
+- Some regions may have multiple time zones
+- Useful for determining appropriate call times
+
+## Valid Phone Number Formats
+
+<Tip>
+**International format examples:**
+```
++1 650 253 0000          (USA)
++44 20 7946 0958         (UK)
++593 99 123 4567         (Ecuador)
++34 912 345 678          (Spain)
++81 3-1234-5678          (Japan)
++61 2 1234 5678          (Australia)
+```
+
+The tool accepts numbers with or without spaces, dashes, and parentheses.
+</Tip>
+
+<Tip>
+**Split format examples:**
+
+Country code (without +):
+- `1` (North America)
+- `44` (United Kingdom)
+- `593` (Ecuador)
+- `34` (Spain)
+
+Number (without country code):
+- `6502530000`
+- `2079460958`
+- `991234567`
+</Tip>
+
+## Common Error Messages
+
+### "Error al parsear número: [Error details]"
+**Cause**: The number format cannot be parsed by the phonenumbers library.
+
+**Common reasons:**
+- Missing country code
+- Invalid characters (letters, special symbols)
+- Incomplete number
+- Wrong country code for the number format
+
+**Solutions:**
+```bash
+# ❌ Wrong
+6502530000                    # Missing country code
++1-650-TWO-FIVE-THREE        # Contains letters
++1 650                        # Incomplete
+
+# ✓ Correct
++1 650 253 0000              # Complete with country code
++16502530000                 # Compact format
+```
+
+### "Opción inválida"
+**Cause**: You entered something other than `1` or `2` when choosing input format.
+
+**Solution**: Enter exactly `1` or `2` when prompted.
+
+### Number Not Valid But Possible
+**What it means**: The number format is technically correct for the country, but the specific number may not be assigned or in service.
+
+**Example scenario:**
+```
+[✗] Número no válido
+[✓] Número posible
+```
+
+This can happen with:
+- Disconnected numbers
+- Numbers in reserved ranges
+- Recently unassigned numbers
+- Test numbers
+
+## Best Practices
+
+<Tip>
+**Input Recommendations:**
+
+1. **Always include country code**: Even for local numbers, include the country code for accurate analysis
+2. **Use Option 1 for known numbers**: Faster when you have the complete number
+3. **Use Option 2 for manual entry**: Reduces errors when typing long numbers
+4. **Remove formatting**: The tool handles it, but clean input reduces parsing errors
+</Tip>
+
+<Tip>
+**Interpreting Carrier Data:**
+
+- Carrier information is not always available
+- Mobile Virtual Network Operators (MVNOs) may show parent carrier
+- Ported numbers may show old carrier data
+- VoIP numbers often show "Unknown" carrier
+</Tip>
+
+<Tip>
+**Privacy and Ethics:**
+
+- This tool uses public phone number databases
+- No personal information about phone owners is revealed
+- Carrier and location data is public routing information
+- Use responsibly and respect privacy laws
+</Tip>
+
+<Warning>
+**Limitations:**
+
+- Carrier data is not available for all countries
+- Some countries don't distinguish between mobile and landline
+- Location is based on area code, not actual device location
+- Number portability may affect accuracy
+</Warning>
+
+## Saved Results
+
+All phone analysis results are saved to `Resultados_Tracker/` directory:
+
+**Filename format**: `Telefono_<country_code><number>_<timestamp>.txt`
+
+**Example**: `Telefono_16502530000_20260304_151823.txt`
+
+**File contents include:**
+- Full analysis timestamp
+- Validation status (valid/possible)
+- All three number formats
+- Geographic information
+- Carrier and type
+- Time zone data
+
+## Country Code Reference
+
+Here are some commonly used country codes:
+
+| Code | Country/Region |
+|------|----------------|
+| +1 | USA, Canada, Caribbean |
+| +7 | Russia, Kazakhstan |
+| +20 | Egypt |
+| +27 | South Africa |
+| +30 | Greece |
+| +31 | Netherlands |
+| +32 | Belgium |
+| +33 | France |
+| +34 | Spain |
+| +39 | Italy |
+| +44 | United Kingdom |
+| +49 | Germany |
+| +52 | Mexico |
+| +54 | Argentina |
+| +55 | Brazil |
+| +56 | Chile |
+| +57 | Colombia |
+| +58 | Venezuela |
+| +81 | Japan |
+| +82 | South Korea |
+| +86 | China |
+| +91 | India |
+| +593 | Ecuador |
+
+<Tip>
+For a complete list of country codes, see [ITU-T E.164](https://en.wikipedia.org/wiki/List_of_country_calling_codes)
+</Tip>
+
+## Navigation
+
+- After viewing results, press `ENTER` to return to the main menu
+- Press `CTRL+C` at any time to exit the application

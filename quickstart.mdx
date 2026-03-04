@@ -1,80 +1,428 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick start
+description: Learn how to use IP-Tracker to geolocate IPs and analyze phone numbers
 ---
 
-## Get started in three steps
+This guide demonstrates the core functionality of IP-Tracker with practical examples.
 
-Get your documentation site running locally and make your first customization.
+## Launch IP-Tracker
 
-### Step 1: Set up your local environment
+Start the tool from the IP-Tracker directory:
+
+```bash
+python3 tracker.py
+```
+
+You'll see the banner and main menu:
+
+```
+ ._____________        ___________                     __                  
+ |   \______   \       \__    ___/___________    ____ |  | __ ___________  
+ |   ||     ___/  ______ |    |  \_  __ \__  \ _/ ___|  |/ // __ \_  __ \ 
+ |   ||    |     /_____/ |    |   |  | \// __ \\  \___|    <\  ___/|  | \/ 
+ |___||____|             |____|   |__|  (____  /\___  >__|_ \\___  >__|    
+                                             \/     \/     \/    \/        
+
+============================================================
+MENÚ PRINCIPAL
+============================================================
+
+[1] Obtener geolocalización de una IP
+[2] Obtener información de número de teléfono
+[3] Salir
+
+[+] Ingrese una opción:
+```
+
+## Track an IP address
+
+<Steps>
+  <Step title="Select IP geolocation">
+    From the main menu, enter `1` to access the IP geolocation menu:
+    
+    ```bash
+    [+] Ingrese una opción: 1
+    ```
+    
+    You'll see three options:
+    ```
+    ============================================================
+    GEOLOCALIZACIÓN DE IP
+    ============================================================
+    
+    [1] Método 1 (ip-api.com) - Más información
+    [2] Método 2 (ipinfo.io) - Alternativo
+    [3] Comparar ambos métodos
+    [99] Volver al menú principal
+    ```
+  </Step>
+  
+  <Step title="Choose a method">
+    Select Method 1 for the most detailed results:
+    
+    ```bash
+    [+] Ingrese una opción: 1
+    ```
+    
+    <Note>
+    Method 1 (ip-api.com) provides more comprehensive data including ISP and AS information. Method 2 (ipinfo.io) includes hostname data. Option 3 runs both methods for cross-validation.
+    </Note>
+  </Step>
+  
+  <Step title="Enter an IP address">
+    Input the IP you want to geolocate. Let's use Google's public DNS:
+    
+    ```bash
+    Ingrese la dirección IP: 8.8.8.8
+    ```
+    
+    The tool validates the IP format before making the API call.
+  </Step>
+  
+  <Step title="View results">
+    IP-Tracker will query the API and display detailed information:
+    
+    ```
+    [*] Consultando ip-api.com...
+    
+    ============================================================
+    RESULTADOS DE GEOLOCALIZACIÓN
+    ============================================================
+    IP: 8.8.8.8
+    País: United States (US)
+    Región: California
+    Ciudad: Mountain View
+    Código postal: 94035
+    Coordenadas: 37.386, -122.0838
+    Zona horaria: America/Los_Angeles
+    ISP: Google LLC
+    Organización: Google Public DNS
+    
+    [✓] Resultados guardados en: Resultados_Tracker/IP_8.8.8.8_20260304_143022.txt
+    [✓] Ver en Google Maps: https://www.google.com/maps?q=37.386,-122.0838
+    
+    [Presiona ENTER para continuar...]
+    ```
+  </Step>
+</Steps>
+
+### Example: Tracking a different IP
+
+Let's try Cloudflare's public DNS (1.1.1.1):
+
+```bash
+Ingrese la dirección IP: 1.1.1.1
+```
+
+**Expected output:**
+
+```
+[*] Consultando ip-api.com...
+
+============================================================
+RESULTADOS DE GEOLOCALIZACIÓN
+============================================================
+IP: 1.1.1.1
+País: Australia (AU)
+Región: Queensland
+Ciudad: South Brisbane
+Código postal: 4101
+Coordenadas: -27.4766, 153.0166
+Zona horaria: Australia/Brisbane
+ISP: Cloudflare, Inc
+Organización: APNIC and Cloudflare DNS Resolver project
+
+[✓] Resultados guardados en: Resultados_Tracker/IP_1.1.1.1_20260304_143156.txt
+[✓] Ver en Google Maps: https://www.google.com/maps?q=-27.4766,153.0166
+```
+
+<Warning>
+Some IP addresses (private ranges like 192.168.x.x, 10.x.x.x, or 172.16-31.x.x) cannot be geolocated as they are reserved for internal networks. The tool will display an error message for these addresses.
+</Warning>
+
+## Analyze a phone number
+
+<Steps>
+  <Step title="Select phone analysis">
+    From the main menu, enter `2`:
+    
+    ```bash
+    [+] Ingrese una opción: 2
+    ```
+    
+    You'll see the phone analysis menu:
+    ```
+    ============================================================
+    ANÁLISIS DE NÚMERO TELEFÓNICO
+    ============================================================
+    
+    Ingresa el número de teléfono:
+    Ejemplo: +593 99 123 4567
+    O ingresa por partes:
+    
+    [1] Ingresar número completo con código
+    [2] Ingresar por partes
+    Opción:
+    ```
+  </Step>
+  
+  <Step title="Choose input method">
+    You can enter the number in two ways:
+    
+    **Option 1: Complete number with country code**
+    ```bash
+    Opción: 1
+    Número completo (con +): +1 650 253 0000
+    ```
+    
+    **Option 2: Enter by parts**
+    ```bash
+    Opción: 2
+    Código de país (sin +): 1
+    Número: 6502530000
+    ```
+    
+    <Note>
+    The country code should start with `+` (Option 1) or be entered without it (Option 2). The tool automatically formats it correctly.
+    </Note>
+  </Step>
+  
+  <Step title="View phone analysis results">
+    IP-Tracker will analyze and display comprehensive information:
+    
+    ```
+    [*] Analizando número: +16502530000
+    
+    ============================================================
+    RESULTADOS DEL ANÁLISIS
+    ============================================================
+    [✓] Número válido
+    [✓] Número posible
+    
+    Formatos:
+      Internacional: +1 650-253-0000
+      E.164: +16502530000
+      Nacional: (650) 253-0000
+    
+    Ubicación:
+      País/Región: United States
+      Código: +1
+    
+    Información adicional:
+      Operador: Desconocido
+      Tipo: Fijo o Móvil
+      Zona horaria: America/Los_Angeles
+    
+    [✓] Resultados guardados en: Resultados_Tracker/Telefono_16502530000_20260304_143845.txt
+    
+    [Presiona ENTER para continuar...]
+    ```
+  </Step>
+</Steps>
+
+### Example: Mobile number analysis
+
+Let's analyze a Spanish mobile number:
+
+```bash
+Opción: 1
+Número completo (con +): +34 612 34 56 78
+```
+
+**Expected output:**
+
+```
+[*] Analizando número: +34612345678
+
+============================================================
+RESULTADOS DEL ANÁLISIS
+============================================================
+[✓] Número válido
+[✓] Número posible
+
+Formatos:
+  Internacional: +34 612 34 56 78
+  E.164: +34612345678
+  Nacional: 612 34 56 78
+
+Ubicación:
+  País/Región: Spain
+  Código: +34
+
+Información adicional:
+  Operador: Movistar
+  Tipo: Móvil
+  Zona horaria: Europe/Madrid
+
+[✓] Resultados guardados en: Resultados_Tracker/Telefono_34612345678_20260304_144012.txt
+```
+
+### Understanding phone number types
+
+The tool identifies these number types:
+
+- **Fijo** (Fixed line): Traditional landline
+- **Móvil** (Mobile): Cellular/mobile number
+- **Fijo o Móvil**: Could be either (ambiguous)
+- **Gratuito** (Toll-free): Free to call (800, 888, etc.)
+- **Tarifa Premium** (Premium rate): Charged at higher rates
+- **VoIP**: Internet-based phone service
+- **Desconocido** (Unknown): Type cannot be determined
+
+## Compare both IP methods
+
+For maximum accuracy, you can query both APIs simultaneously:
+
+<Steps>
+  <Step title="Select compare option">
+    ```bash
+    [+] Ingrese una opción: 3
+    Ingrese la dirección IP: 8.8.4.4
+    ```
+  </Step>
+  
+  <Step title="View dual results">
+    Both methods will run sequentially:
+    
+    ```
+    [*] Consultando ip-api.com...
+    
+    ============================================================
+    RESULTADOS DE GEOLOCALIZACIÓN
+    ============================================================
+    IP: 8.8.4.4
+    País: United States (US)
+    ...
+    
+    [*] Consultando ipinfo.io...
+    
+    ============================================================
+    RESULTADOS DE GEOLOCALIZACIÓN
+    ============================================================
+    IP: 8.8.4.4
+    Hostname: dns.google
+    ...
+    ```
+    
+    <Note>
+    Two separate result files are created, allowing you to compare data sources and verify accuracy.
+    </Note>
+  </Step>
+</Steps>
+
+## Viewing saved results
+
+All queries are automatically saved with timestamps. To view a result file:
+
+```bash
+cat Resultados_Tracker/IP_8.8.8.8_20260304_143022.txt
+```
+
+**Example file content:**
+
+```
+============================================================
+INFORMACIÓN DE GEOLOCALIZACIÓN IP - MÉTODO 1
+============================================================
+
+Fecha de consulta: 2026-03-04 14:30:22
+IP: 8.8.8.8
+País: United States
+Código de país: US
+Región: California
+Ciudad: Mountain View
+Código postal: 94035
+Latitud: 37.386
+Longitud: -122.0838
+Zona horaria: America/Los_Angeles
+ISP: Google LLC
+Organización: Google Public DNS
+AS: AS15169 Google LLC
+
+Google Maps: https://www.google.com/maps?q=37.386,-122.0838
+```
+
+## Error handling examples
+
+### Invalid IP address
+
+```bash
+Ingrese la dirección IP: 999.999.999.999
+[!] Dirección IP inválida
+```
+
+### Private IP address
+
+```bash
+Ingrese la dirección IP: 192.168.1.1
+[*] Consultando ip-api.com...
+[!] Error: IP inválida o privada
+```
+
+### Invalid phone number
+
+```bash
+Número completo (con +): +1 123
+[!] Error al parsear número: The string supplied is too short to be a phone number
+```
+
+### API timeout
+
+```bash
+[*] Consultando ip-api.com...
+[!] Error: Tiempo de espera agotado
+```
+
+<Warning>
+If you experience repeated timeouts, check your internet connection or firewall settings. Some networks may block external API requests.
+</Warning>
+
+## Tips for effective usage
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion title="Document your findings">
+    All results are automatically saved with timestamps. Use these files for:
+    - Building evidence chains in investigations
+    - Creating reports with timestamped queries
+    - Correlating multiple IP addresses in an incident
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+  
+  <Accordion title="Cross-validate with both methods">
+    When accuracy is critical, use option 3 to query both APIs. Compare results to:
+    - Verify geographic location consistency
+    - Get additional data points (hostname from Method 2)
+    - Identify discrepancies between data sources
+  </Accordion>
+  
+  <Accordion title="Understand API limitations">
+    The free APIs have some limitations:
+    - ip-api.com: Rate limited to 45 requests per minute
+    - ipinfo.io: Limited data without API key
+    - Neither provides real-time user location, only network infrastructure location
+  </Accordion>
+  
+  <Accordion title="Validate phone numbers before analysis">
+    The tool validates numbers using Google's libphonenumber. If a number shows as invalid:
+    - Check the country code is correct
+    - Ensure the number length matches the country's format
+    - Some VoIP or special numbers may not validate
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## Keyboard shortcuts
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+- **Enter**: Continue after viewing results
+- **Ctrl+C**: Exit the program at any time
+- **99**: Return to main menu from IP geolocation menu
+- **3**: Exit from main menu
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="API reference" icon="book" href="/api/overview">
+    Learn about the APIs used by IP-Tracker
+  </Card>
+  <Card title="Usage guide" icon="graduation-cap" href="/usage/ip-tracking">
+    Tips for OSINT investigations and advanced features
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

@@ -1,97 +1,167 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "IP-Tracker Documentation"
+mode: "custom"
 ---
 
-## Setting up
+<div className="relative overflow-hidden bg-gradient-to-br from-[#1e40af] via-[#2563eb] to-[#3b82f6] dark:from-[#0f1117] dark:via-[#1a1d27] dark:to-[#1e40af] py-20">
+  <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10"></div>
+  <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
+    <div className="text-center">
+      <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6">
+        IP-Tracker
+      </h1>
+      <p className="text-xl sm:text-2xl text-blue-100 dark:text-gray-300 max-w-3xl mx-auto mb-10">
+        Advanced IP geolocation and phone number lookup tool for OSINT and cybersecurity research
+      </p>
+      <div className="flex flex-wrap gap-4 justify-center">
+        <a 
+          href="/quickstart" 
+          className="px-8 py-3.5 bg-white text-[#2563eb] font-semibold rounded-lg hover:bg-gray-100 transition-colors no-underline"
+        >
+          Get Started
+        </a>
+        <a 
+          href="/introduction" 
+          className="px-8 py-3.5 border border-white/30 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors no-underline"
+        >
+          Learn More
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">Quick start</h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">Get IP-Tracker running in minutes</p>
+  
+  <Steps>
+    <Step title="Clone the repository">
+      Download IP-Tracker to your local machine:
+      
+      ```bash
+      git clone https://github.com/Devsebastian44/IP-Tracker.git
+      cd IP-Tracker
+      ```
+    </Step>
+    
+    <Step title="Install dependencies">
+      Ensure you have Python 3.8 or higher installed. The tool uses standard libraries plus `requests` and `phonenumbers`:
+      
+      ```bash
+      pip install requests phonenumbers
+      ```
+    </Step>
+    
+    <Step title="Run IP-Tracker">
+      Launch the interactive menu:
+      
+      ```bash
+      python3 tracker.py
+      ```
+      
+      Select option 1 to track an IP address or option 2 to analyze a phone number.
+    </Step>
+  </Steps>
+</div>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">Core features</h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">Everything you need for OSINT intelligence gathering</p>
+  
+  <CardGroup cols={2}>
     <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+      title="IP geolocation"
+      icon="location-dot"
+      href="/features/ip-geolocation"
+    >
+      Track IP addresses using dual API providers with detailed geographic data, ISP information, and Google Maps integration.
+    </Card>
+    <Card
+      title="Phone number lookup"
+      icon="phone"
+      href="/features/phone-lookup"
+    >
+      Validate phone numbers and retrieve carrier, country, timezone, and number type information using international standards.
+    </Card>
+    <Card
+      title="Comparison mode"
+      icon="code-compare"
+      href="/usage/comparison-mode"
+    >
+      Run multiple geolocation APIs simultaneously to cross-verify results and maximize data accuracy.
+    </Card>
+    <Card
+      title="Auto export"
+      icon="file-export"
+      href="/features/output-management"
+    >
+      Automatically save all results to timestamped text files for documentation and evidence collection.
+    </Card>
+  </CardGroup>
+</div>
 
-## Create beautiful pages
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">Explore by topic</h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">Deep dive into IP-Tracker capabilities</p>
+  
+  <CardGroup cols={3}>
+    <Card
+      title="Installation"
+      icon="download"
+      href="/installation"
+    >
+      System requirements and setup instructions
+    </Card>
+    <Card
+      title="IP tracking"
+      icon="radar"
+      href="/usage/ip-tracking"
+    >
+      Complete guide to IP geolocation features
+    </Card>
+    <Card
+      title="Phone analysis"
+      icon="mobile"
+      href="/usage/phone-analysis"
+    >
+      How to analyze phone numbers step-by-step
+    </Card>
+    <Card
+      title="API reference"
+      icon="code"
+      href="/api/overview"
+    >
+      Function signatures and parameters
+    </Card>
+    <Card
+      title="Troubleshooting"
+      icon="wrench"
+      href="/resources/troubleshooting"
+    >
+      Common issues and solutions
+    </Card>
+    <Card
+      title="Legal disclaimer"
+      icon="scale-balanced"
+      href="/resources/legal-disclaimer"
+    >
+      Terms of use and ethical guidelines
+    </Card>
+  </CardGroup>
+</div>
 
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="rounded-2xl border border-gray-200 dark:border-[#27272a] bg-gray-50 dark:bg-[#1a1d27] p-8 text-center">
+    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Ready to start tracking?</h2>
+    <p className="text-base text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
+      Follow the quickstart guide to run your first IP lookup in under 5 minutes.
+    </p>
+    <a 
+      href="/quickstart" 
+      className="inline-block px-8 py-3 bg-[#2563eb] text-white font-semibold rounded-lg hover:bg-[#1e40af] transition-colors no-underline"
+    >
+      View quickstart
+    </a>
+  </div>
+</div>
